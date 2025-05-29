@@ -1,9 +1,11 @@
 import { CreateRespuestaDto } from './dto/create-respuesta.dto';
-import { UpdateRespuestaDto } from './dto/update-respuesta.dto';
+import { Encuesta } from 'src/encuestas/entities/encuesta.entity';
+import { Repository } from 'typeorm';
+import { Respuesta } from './entities/respuesta.entity';
 export declare class RespuestasService {
-    create(createRespuestaDto: CreateRespuestaDto): string;
-    findAll(): string;
-    findOne(id: number): string;
-    update(id: number, updateRespuestaDto: UpdateRespuestaDto): string;
-    remove(id: number): string;
+    private readonly respuestaRepository;
+    private readonly encuestaRepository;
+    constructor(respuestaRepository: Repository<Respuesta>, encuestaRepository: Repository<Encuesta>);
+    create(createRespuestaDto: CreateRespuestaDto): Promise<Respuesta>;
+    findByEncuestaId(encuestaId: number): Promise<Respuesta | null>;
 }

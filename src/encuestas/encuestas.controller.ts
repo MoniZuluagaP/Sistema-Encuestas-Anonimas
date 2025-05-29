@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { EncuestasService } from './encuestas.service';
 import { CreateEncuestaDto } from './dto/create-encuesta.dto';

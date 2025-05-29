@@ -10,11 +10,16 @@ exports.RespuestasAbiertasModule = void 0;
 const common_1 = require("@nestjs/common");
 const respuestas_abiertas_service_1 = require("./respuestas-abiertas.service");
 const respuestas_abiertas_controller_1 = require("./respuestas-abiertas.controller");
+const typeorm_1 = require("@nestjs/typeorm");
+const respuesta_entity_1 = require("../respuestas/entities/respuesta.entity");
+const respuesta_abierta_entity_1 = require("./entities/respuesta-abierta.entity");
+const pregunta_entity_1 = require("../preguntas/entities/pregunta.entity");
 let RespuestasAbiertasModule = class RespuestasAbiertasModule {
 };
 exports.RespuestasAbiertasModule = RespuestasAbiertasModule;
 exports.RespuestasAbiertasModule = RespuestasAbiertasModule = __decorate([
     (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([respuesta_entity_1.Respuesta, respuesta_abierta_entity_1.RespuestaAbierta, pregunta_entity_1.Pregunta])],
         controllers: [respuestas_abiertas_controller_1.RespuestasAbiertasController],
         providers: [respuestas_abiertas_service_1.RespuestasAbiertasService],
     })

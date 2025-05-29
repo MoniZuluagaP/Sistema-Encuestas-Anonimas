@@ -8,6 +8,8 @@ import { PreguntasModule } from './preguntas/preguntas.module';
 import { OpcionesModule } from './opciones/opciones.module';
 import { RespuestasModule } from './respuestas/respuestas.module';
 import { typeOrmConfig } from './config/typeorm.config';
+import { RespuestasAbiertasModule } from './respuestas-abiertas/respuestas-abiertas.module';
+import { RespuestasOpcionesModule } from './respuestas-opciones/respuestas-opciones.module';
 
 @Module({
   imports: [
@@ -21,7 +23,9 @@ import { typeOrmConfig } from './config/typeorm.config';
     EncuestasModule, 
     PreguntasModule, 
     OpcionesModule, 
-    RespuestasModule],
+    RespuestasModule,
+    RespuestasAbiertasModule,
+    RespuestasOpcionesModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,26 +1,75 @@
-import { Injectable } from '@nestjs/common';
-import { CreateRespuestasAbiertaDto } from './dto/create-respuestas-abierta.dto';
-import { UpdateRespuestasAbiertaDto } from './dto/update-respuestas-abierta.dto';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { RespuestaAbierta } from './entities/respuesta-abierta.entity';
+import { Pregunta } from 'src/preguntas/entities/pregunta.entity';
+import { Respuesta } from 'src/respuestas/entities/respuesta.entity';
+import { TipoRespuesta } from 'src/preguntas/entities/pregunta.entity';
+import { CreateRespuestaAbiertaDto } from './dto/create-respuestas-abiertas.dto';
 
 @Injectable()
 export class RespuestasAbiertasService {
-  create(createRespuestasAbiertaDto: CreateRespuestasAbiertaDto) {
-    return 'This action adds a new respuestasAbierta';
+  constructor(
+    @InjectRepository(RespuestaAbierta)
+    private readonly respuestaAbiertaRepository: Repository<RespuestaAbierta>,
+
+    @InjectRepository(Pregunta)
+    private readonly preguntaRepository: Repository<Pregunta>,
+
+    @InjectRepository(Respuesta)
+    private readonly respuestaRepository: Repository<Respuesta>,
+  ) {}
+
+  // Se crea una respuesta de tipo abierta y se guarda relacionandola con su pregunta y con el registro completo de respuestas
+async create(createRespuestaAbiertaDto: CreateRespuestaAbiertaDto): Promise<RespuestaAbierta> {
+  const pregunta = await this.preguntaRepository.findOne({
+    where: { id: createRespuestaAbiertaDto.preguntaId },
+  });
+
+  if (!pregunta) {
+    throw new NotFoundException('Pregunta no encontrada');
   }
 
-  findAll() {
-    return `This action returns all respuestasAbiertas`;
+  if (pregunta.tipo !== TipoRespuesta.ABIERTA) {
+    throw new BadRequestException('La pregunta no es de tipo abierta');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} respuestasAbierta`;
+  const respuesta = await this.respuestaRepository.findOne({
+    where: { id: createRespuestaAbiertaDto.respuestaId },
+  });
+
+  if (!respuesta) {
+    throw new NotFoundException('No se encuentra el registro de respuestas de la encuesta');
   }
 
-  update(id: number, updateRespuestasAbiertaDto: UpdateRespuestasAbiertaDto) {
-    return `This action updates a #${id} respuestasAbierta`;
+  // Validación para evitar enviar dos respuestas de la misma pregunta en una misma participacion
+  const yaExiste = await this.respuestaAbiertaRepository.findOne({
+    where: {
+      pregunta: { id: createRespuestaAbiertaDto.preguntaId },
+      respuesta: { id: createRespuestaAbiertaDto.respuestaId },
+    },
+  });
+
+  if (yaExiste) {
+    throw new ConflictException('Ya existe una respuesta para esta pregunta ');
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} respuestasAbierta`;
-  }
+  const nueva = this.respuestaAbiertaRepository.create({
+    texto: createRespuestaAbiertaDto.texto,
+    pregunta,
+    respuesta,
+  });
+
+  return this.respuestaAbiertaRepository.save(nueva);
+}
+
+
+  // Busca las respuestas abiertas de un registro de respuestas completo de una encuesta
+  async findRespuestasAbiertasByRespuestaId(respuestaId: number): Promise<RespuestaAbierta[]> {
+  return this.respuestaAbiertaRepository.find({
+    where: { respuesta: { id: respuestaId } },
+    relations: ['pregunta'], // para saber a qué pregunta corresponde cada una
+  });
+}
+
 }

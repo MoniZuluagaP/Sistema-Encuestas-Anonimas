@@ -10,13 +10,18 @@ exports.RespuestasModule = void 0;
 const common_1 = require("@nestjs/common");
 const respuestas_service_1 = require("./respuestas.service");
 const respuestas_controller_1 = require("./respuestas.controller");
+const typeorm_1 = require("@nestjs/typeorm");
+const encuesta_entity_1 = require("../encuestas/entities/encuesta.entity");
+const respuesta_entity_1 = require("./entities/respuesta.entity");
 let RespuestasModule = class RespuestasModule {
 };
 exports.RespuestasModule = RespuestasModule;
 exports.RespuestasModule = RespuestasModule = __decorate([
     (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([respuesta_entity_1.Respuesta, encuesta_entity_1.Encuesta])],
         controllers: [respuestas_controller_1.RespuestasController],
         providers: [respuestas_service_1.RespuestasService],
+        exports: [respuestas_service_1.RespuestasService]
     })
 ], RespuestasModule);
 //# sourceMappingURL=respuestas.module.js.map

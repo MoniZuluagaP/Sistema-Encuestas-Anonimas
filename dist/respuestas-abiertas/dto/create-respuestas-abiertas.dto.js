@@ -9,14 +9,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateRespuestaDto = void 0;
+exports.CreateRespuestaAbiertaDto = void 0;
 const class_validator_1 = require("class-validator");
-class CreateRespuestaDto {
-    codigoEncuesta;
+class CreateRespuestaAbiertaDto {
+    texto;
+    respuestaId;
+    preguntaId;
 }
-exports.CreateRespuestaDto = CreateRespuestaDto;
+exports.CreateRespuestaAbiertaDto = CreateRespuestaAbiertaDto;
 __decorate([
-    (0, class_validator_1.IsUUID)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], CreateRespuestaDto.prototype, "codigoEncuesta", void 0);
-//# sourceMappingURL=create-respuesta.dto.js.map
+], CreateRespuestaAbiertaDto.prototype, "texto", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], CreateRespuestaAbiertaDto.prototype, "respuestaId", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], CreateRespuestaAbiertaDto.prototype, "preguntaId", void 0);
+//# sourceMappingURL=create-respuestas-abiertas.dto.js.map

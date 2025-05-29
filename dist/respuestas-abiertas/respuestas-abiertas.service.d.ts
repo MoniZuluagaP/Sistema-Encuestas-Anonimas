@@ -1,9 +1,13 @@
-import { CreateRespuestasAbiertaDto } from './dto/create-respuestas-abierta.dto';
-import { UpdateRespuestasAbiertaDto } from './dto/update-respuestas-abierta.dto';
+import { Repository } from 'typeorm';
+import { RespuestaAbierta } from './entities/respuesta-abierta.entity';
+import { Pregunta } from 'src/preguntas/entities/pregunta.entity';
+import { Respuesta } from 'src/respuestas/entities/respuesta.entity';
+import { CreateRespuestaAbiertaDto } from './dto/create-respuestas-abiertas.dto';
 export declare class RespuestasAbiertasService {
-    create(createRespuestasAbiertaDto: CreateRespuestasAbiertaDto): string;
-    findAll(): string;
-    findOne(id: number): string;
-    update(id: number, updateRespuestasAbiertaDto: UpdateRespuestasAbiertaDto): string;
-    remove(id: number): string;
+    private readonly respuestaAbiertaRepository;
+    private readonly preguntaRepository;
+    private readonly respuestaRepository;
+    constructor(respuestaAbiertaRepository: Repository<RespuestaAbierta>, preguntaRepository: Repository<Pregunta>, respuestaRepository: Repository<Respuesta>);
+    create(createRespuestaAbiertaDto: CreateRespuestaAbiertaDto): Promise<RespuestaAbierta>;
+    findRespuestasAbiertasByRespuestaId(respuestaId: number): Promise<RespuestaAbierta[]>;
 }

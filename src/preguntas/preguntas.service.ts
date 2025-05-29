@@ -11,18 +11,18 @@ import { OpcionesService } from 'src/opciones/opciones.service';
 export class PreguntasService {
   constructor(
     @InjectRepository(Pregunta)
-    private readonly preguntaRepo: Repository<Pregunta>,
+    private readonly preguntaRepository: Repository<Pregunta>,
 
     private readonly opcionesService: OpcionesService,
 
     @InjectRepository(Encuesta)
-    private readonly encuestaRepo: Repository<Encuesta>,
+    private readonly encuestaRepository: Repository<Encuesta>,
   ) {}
   
   //Crear una pregunta y asignarla a la encuesta segun el Id 
   async create(createPreguntaDto: CreatePreguntaDto): Promise<Pregunta> {
   
-    const encuesta = await this.encuestaRepo.findOneBy({ id: createPreguntaDto.encuestaId });
+    const encuesta = await this.encuestaRepository.findOneBy({ id: createPreguntaDto.encuestaId });
 
     if (!encuesta) {
       throw new NotFoundException(
@@ -30,25 +30,19 @@ export class PreguntasService {
       );
     }
 
-    const nuevaPregunta = this.preguntaRepo.create({
+    const nuevaPregunta = this.preguntaRepository.create({
       numero: createPreguntaDto.numero,
       texto: createPreguntaDto.texto,
       tipo: createPreguntaDto.tipo,
       encuesta,
     });
 
-    return this.preguntaRepo.save(nuevaPregunta);
+    return this.preguntaRepository.save(nuevaPregunta);
 }
 
-  /* async obtenerPreguntasPorEncuesta(encuestaId: number): Promise<Pregunta[]> {
-    return this.preguntaRepo.find({
-      where: { encuesta: { id: encuestaId } },
-      //relations: ['opciones'], // Incluye opciones si aplica
-    });
-  } */
 
   async obtenerPreguntasPorEncuesta(encuestaId: number): Promise<any[]> {
-    const preguntas = await this.preguntaRepo.find({
+    const preguntas = await this.preguntaRepository.find({
       where: { encuesta: { id: encuestaId } },
     });
 

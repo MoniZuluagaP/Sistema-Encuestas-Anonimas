@@ -12,16 +12,40 @@ const typeorm_1 = require("@nestjs/typeorm");
 const encuestas_service_1 = require("./encuestas.service");
 const encuestas_controller_1 = require("./encuestas.controller");
 const encuesta_entity_1 = require("./entities/encuesta.entity");
-const preguntas_module_1 = require("../preguntas/preguntas.module");
-const opciones_module_1 = require("../opciones/opciones.module");
+const pregunta_entity_1 = require("../preguntas/entities/pregunta.entity");
+const preguntas_service_1 = require("../preguntas/preguntas.service");
+const opciones_entity_1 = require("../opciones/entities/opciones.entity");
+const opciones_service_1 = require("../opciones/opciones.service");
+const respuesta_entity_1 = require("../respuestas/entities/respuesta.entity");
+const respuestas_service_1 = require("../respuestas/respuestas.service");
+const respuesta_abierta_entity_1 = require("../respuestas-abiertas/entities/respuesta-abierta.entity");
+const respuestas_abiertas_service_1 = require("../respuestas-abiertas/respuestas-abiertas.service");
+const respuesta_opciones_entity_1 = require("../respuestas-opciones/entities/respuesta-opciones.entity");
+const respuestas_opciones_service_1 = require("../respuestas-opciones/respuestas-opciones.service");
 let EncuestasModule = class EncuestasModule {
 };
 exports.EncuestasModule = EncuestasModule;
 exports.EncuestasModule = EncuestasModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([encuesta_entity_1.Encuesta]), preguntas_module_1.PreguntasModule, opciones_module_1.OpcionesModule],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([
+                encuesta_entity_1.Encuesta,
+                pregunta_entity_1.Pregunta,
+                opciones_entity_1.Opcion,
+                respuesta_entity_1.Respuesta,
+                respuesta_abierta_entity_1.RespuestaAbierta,
+                respuesta_opciones_entity_1.RespuestaOpcion,
+            ]),
+        ],
         controllers: [encuestas_controller_1.EncuestasController],
-        providers: [encuestas_service_1.EncuestasService],
+        providers: [
+            encuestas_service_1.EncuestasService,
+            preguntas_service_1.PreguntasService,
+            opciones_service_1.OpcionesService,
+            respuestas_service_1.RespuestasService,
+            respuestas_abiertas_service_1.RespuestasAbiertasService,
+            respuestas_opciones_service_1.RespuestasOpcionesService,
+        ],
     })
 ], EncuestasModule);
 //# sourceMappingURL=encuestas.module.js.map

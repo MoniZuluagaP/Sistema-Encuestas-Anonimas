@@ -1,9 +1,13 @@
-import { CreateRespuestasOpcioneDto } from './dto/create-respuestas-opcione.dto';
-import { UpdateRespuestasOpcioneDto } from './dto/update-respuestas-opcione.dto';
+import { Repository } from 'typeorm';
+import { Respuesta } from 'src/respuestas/entities/respuesta.entity';
+import { Opcion } from 'src/opciones/entities/opciones.entity';
+import { RespuestaOpcion } from './entities/respuesta-opciones.entity';
+import { CreateRespuestaOpcionDto } from './dto/create-respuestas-opciones.dto';
 export declare class RespuestasOpcionesService {
-    create(createRespuestasOpcioneDto: CreateRespuestasOpcioneDto): string;
-    findAll(): string;
-    findOne(id: number): string;
-    update(id: number, updateRespuestasOpcioneDto: UpdateRespuestasOpcioneDto): string;
-    remove(id: number): string;
+    private readonly respuestaOpcionRepository;
+    private readonly opcionRepository;
+    private readonly respuestaRepository;
+    constructor(respuestaOpcionRepository: Repository<RespuestaOpcion>, opcionRepository: Repository<Opcion>, respuestaRepository: Repository<Respuesta>);
+    create(createRespuestaOpcionDto: CreateRespuestaOpcionDto): Promise<RespuestaOpcion>;
+    findByRespuestaId(respuestaId: number): Promise<RespuestaOpcion[]>;
 }

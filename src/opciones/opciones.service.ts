@@ -8,18 +8,19 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class OpcionesService {
+  
   constructor(
     @InjectRepository(Opcion)
-    private readonly opcionRepo: Repository<Opcion>,
+    private readonly opcionRepository: Repository<Opcion>,
 
     @InjectRepository(Pregunta)
-    private readonly preguntaRepo: Repository<Pregunta>,
+    private readonly preguntaRepository: Repository<Pregunta>,
   ) {}
   
 
-  //Si la pregunta es de tipo de respusta con opciones, busca la pregunta y sus opciones de respuesta para poderlo utilizar en el encuestas.service
+  //Si la pregunta es de tipo de respuesta con opciones, busca la pregunta y sus opciones de respuesta para poderlo utilizar en el encuestas.service
     async findOpcionesByPregunta(preguntaId: number): Promise<Opcion[]> {
-    const pregunta = await this.preguntaRepo.findOne({ where: { id: preguntaId } });
+    const pregunta = await this.preguntaRepository.findOne({ where: { id: preguntaId } });
 
     if (!pregunta) {
       throw new NotFoundException('Pregunta no encontrada');
@@ -33,7 +34,7 @@ export class OpcionesService {
       return [];
     }
 
-    return this.opcionRepo.find({
+    return this.opcionRepository.find({
       where: { pregunta: { id: preguntaId } }
     });
   }
@@ -41,7 +42,7 @@ export class OpcionesService {
 
   //Crear opcion de respuesta de una pregunta con tipo respuesta con opcion simple o respuesta con opcion multiple
   async createOpcion(createOpcionDto: CreateOpcionDto): Promise<Opcion> {
-  const pregunta = await this.preguntaRepo.findOne({
+  const pregunta = await this.preguntaRepository.findOne({
     where: { id: createOpcionDto.preguntaId },
   });
 
@@ -61,13 +62,13 @@ export class OpcionesService {
     );
   }
 
-  const newOpcionRespuesta = this.opcionRepo.create({
+  const newOpcionRespuesta = this.opcionRepository.create({
     texto: createOpcionDto.texto,
     numero: createOpcionDto.numero,
     pregunta: pregunta,
   });
 
-  return this.opcionRepo.save(newOpcionRespuesta);
+  return this.opcionRepository.save(newOpcionRespuesta);
 }
 
 

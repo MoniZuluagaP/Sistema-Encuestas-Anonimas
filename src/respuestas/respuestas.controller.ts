@@ -1,34 +1,31 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { RespuestasService } from './respuestas.service';
 import { CreateRespuestaDto } from './dto/create-respuesta.dto';
-import { UpdateRespuestaDto } from './dto/update-respuesta.dto';
 
 @Controller('respuestas')
 export class RespuestasController {
   constructor(private readonly respuestasService: RespuestasService) {}
 
+  // Metodo con el que guardamos todas las respuestas (abiertas o cerradas) de un usuario y se relacionan a una encuesta
+  // este metodo se ejecuta primero al dar enviar /guardar respuestas , para despues 
   @Post()
   create(@Body() createRespuestaDto: CreateRespuestaDto) {
     return this.respuestasService.create(createRespuestaDto);
   }
 
-  @Get()
-  findAll() {
-    return this.respuestasService.findAll();
+
+  @Get('/encuesta/:id')
+  findByEncuestaId(@Param('id') encuestaId: string) {
+    return this.respuestasService.findByEncuestaId(+encuestaId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.respuestasService.findOne(+id);
-  }
-
-  @Patch(':id')
+/*   @Patch(':id')
   update(@Param('id') id: string, @Body() updateRespuestaDto: UpdateRespuestaDto) {
     return this.respuestasService.update(+id, updateRespuestaDto);
-  }
+  } */
 
-  @Delete(':id')
+/*   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.respuestasService.remove(+id);
-  }
+    return this.respuestasService.remove(+id); 
+  }*/
 }

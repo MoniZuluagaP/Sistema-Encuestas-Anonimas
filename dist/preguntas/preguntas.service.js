@@ -20,29 +20,29 @@ const typeorm_2 = require("typeorm");
 const pregunta_entity_1 = require("./entities/pregunta.entity");
 const opciones_service_1 = require("../opciones/opciones.service");
 let PreguntasService = class PreguntasService {
-    preguntaRepo;
+    preguntaRepository;
     opcionesService;
-    encuestaRepo;
-    constructor(preguntaRepo, opcionesService, encuestaRepo) {
-        this.preguntaRepo = preguntaRepo;
+    encuestaRepository;
+    constructor(preguntaRepository, opcionesService, encuestaRepository) {
+        this.preguntaRepository = preguntaRepository;
         this.opcionesService = opcionesService;
-        this.encuestaRepo = encuestaRepo;
+        this.encuestaRepository = encuestaRepository;
     }
     async create(createPreguntaDto) {
-        const encuesta = await this.encuestaRepo.findOneBy({ id: createPreguntaDto.encuestaId });
+        const encuesta = await this.encuestaRepository.findOneBy({ id: createPreguntaDto.encuestaId });
         if (!encuesta) {
             throw new common_1.NotFoundException(`Encuesta con ID ${createPreguntaDto.encuestaId} no encontrada`);
         }
-        const nuevaPregunta = this.preguntaRepo.create({
+        const nuevaPregunta = this.preguntaRepository.create({
             numero: createPreguntaDto.numero,
             texto: createPreguntaDto.texto,
             tipo: createPreguntaDto.tipo,
             encuesta,
         });
-        return this.preguntaRepo.save(nuevaPregunta);
+        return this.preguntaRepository.save(nuevaPregunta);
     }
     async obtenerPreguntasPorEncuesta(encuestaId) {
-        const preguntas = await this.preguntaRepo.find({
+        const preguntas = await this.preguntaRepository.find({
             where: { encuesta: { id: encuestaId } },
         });
         return Promise.all(preguntas.map(async (pregunta) => {

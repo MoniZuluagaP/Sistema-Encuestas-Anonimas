@@ -1,0 +1,337 @@
+{
+	"info": {
+		"_postman_id": "cb4c4faa-fdfd-4245-91c4-445a2f87c320",
+		"name": "sistema Encuestas Anonimas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38405198"
+	},
+	"item": [
+		{
+			"name": "Crear Encuesta",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nombre\": \"Encuesta desde PC escritorio\",\n    \"fecha_vencimiento\": \"2025-06-01\",\n    \"email\": \"monizuluaga@mail.com\"\n}\n\n    // Datos necesarios\n    \n    // \"nombre\": string,\n    // \"fecha_vencimiento\": \"anio-mes-dia\",\n    // \"email\": string\n\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/encuesta",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"encuesta"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar una encuesta mediante codigo  unico",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/encuesta/:codigo_unico",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"encuesta",
+						":codigo_unico"
+					],
+					"variable": [
+						{
+							"key": "codigo_unico",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear una pregunta de una encuesta",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"numero\": 4,\n    \"texto\": \"Pregunta 4 de prueba de encuesta 5\",\n    \"tipo\": \"OPCION_MULTIPLE_SELECCION_SIMPLE\",\n    \"encuestaId\": 5  //El id de la encuesta que tiene esta pregunta\n}\n\n\n    // Datos necesarios\n\n    //\"numero\": number,\n    //\"texto\": \"string\",\n    //\"tipo\": \"ABIERTA\", \"OPCION_MULTIPLE_SELECCION_SIMPLE\" o \"OPCION_MULTIPLE_SELECCION_MULTIPLE\",\n    //encuestaId: number \n\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/preguntas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"preguntas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener todas las preguntas de una encuesta",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/preguntas/encuesta/:idEncuesta",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"preguntas",
+						"encuesta",
+						":idEncuesta"
+					],
+					"variable": [
+						{
+							"key": "idEncuesta",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear opcion de una pregunta que tenga tipo respuesta con opciones",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"texto\": \"opcion 1 de pregunta6\",\n    \"numero\": 1,\n    \"preguntaId\": 6\n}\n\n\n//datos necesarios\n\n//\"texto\": \"opcion 1 de pregunta6\",\n//\"numero\": number,\n//\"preguntaId\": number",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/opcion",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"opcion"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar todas las opciones de una pregunta de opcion simple o multiple",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/opcion/pregunta/:idPregunta",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"opcion",
+						"pregunta",
+						":idPregunta"
+					],
+					"variable": [
+						{
+							"key": "idPregunta",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear el registro de respuestas de una encuesta",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"codigoEncuesta\": 1  //El codigo unico (codigo_resultados, de la encuesta que va a tener el registro de respuestas\r\n}\r\n\r\n//Datos necesarios\r\n\r\n//\"codigoEncuesta\": number",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/respuestas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"respuestas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener el registro maestro de las respuestas de una encuesta",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http//:localhost:3000/respuestas/encuesta/:idEncuesta",
+					"host": [
+						"http"
+					],
+					"path": [
+						"",
+						":localhost:3000",
+						"respuestas",
+						"encuesta",
+						":idEncuesta"
+					],
+					"variable": [
+						{
+							"key": "localhost:3000",
+							"value": ""
+						},
+						{
+							"key": "idEncuesta",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear las respuestas abiertas de las preguntas de una encuesta",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"texto\": \"string\",\n    \"respuestaId\": 1,  //Corresponde al registro maestro donde estan todas las respuestas de una encuesta\n    \"preguntaId\": 1\n}\n\n\n    // Datos necesarios\n\n    //\"texto\": \"string\"\n    //\"respuestaId\": number\n    //\"preguntaId\": 1 \n\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/respuestas-abiertas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"respuestas-abiertas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener las respuestas abiertas de un registro completo de respuestas de una encuesta",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/respuestas-abiertas/respuesta/:idEncuesta",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"respuestas-abiertas",
+						"respuesta",
+						":idEncuesta"
+					],
+					"variable": [
+						{
+							"key": "idEncuesta",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear las respuestas de opcion simple o multiple de las preguntas de una encuesta",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"respuestaId\": 1,  //Corresponde al registro maestro donde estan todas las respuestas de una encuesta\r\n    \"opcionId\": 1   //id de la opcion de respuesta\r\n}\r\n\r\n\r\n//Datos necesarios\r\n\r\n//\"respuestaId\": number\r\n//\"opcionId\": number",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/respuestas-opciones",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"respuestas-opciones"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

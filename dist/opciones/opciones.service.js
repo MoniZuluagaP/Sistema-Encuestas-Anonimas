@@ -19,14 +19,14 @@ const opciones_entity_1 = require("./entities/opciones.entity");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 let OpcionesService = class OpcionesService {
-    opcionRepo;
-    preguntaRepo;
-    constructor(opcionRepo, preguntaRepo) {
-        this.opcionRepo = opcionRepo;
-        this.preguntaRepo = preguntaRepo;
+    opcionRepository;
+    preguntaRepository;
+    constructor(opcionRepository, preguntaRepository) {
+        this.opcionRepository = opcionRepository;
+        this.preguntaRepository = preguntaRepository;
     }
     async findOpcionesByPregunta(preguntaId) {
-        const pregunta = await this.preguntaRepo.findOne({ where: { id: preguntaId } });
+        const pregunta = await this.preguntaRepository.findOne({ where: { id: preguntaId } });
         if (!pregunta) {
             throw new common_1.NotFoundException('Pregunta no encontrada');
         }
@@ -35,12 +35,12 @@ let OpcionesService = class OpcionesService {
         if (!esTipoConOpciones) {
             return [];
         }
-        return this.opcionRepo.find({
+        return this.opcionRepository.find({
             where: { pregunta: { id: preguntaId } }
         });
     }
     async createOpcion(createOpcionDto) {
-        const pregunta = await this.preguntaRepo.findOne({
+        const pregunta = await this.preguntaRepository.findOne({
             where: { id: createOpcionDto.preguntaId },
         });
         if (!pregunta) {
@@ -53,12 +53,12 @@ let OpcionesService = class OpcionesService {
         if (!tiposPermitidos.includes(pregunta.tipo)) {
             throw new common_1.BadRequestException(`No se pueden agregar opciones a una pregunta de tipo ${pregunta.tipo}`);
         }
-        const newOpcionRespuesta = this.opcionRepo.create({
+        const newOpcionRespuesta = this.opcionRepository.create({
             texto: createOpcionDto.texto,
             numero: createOpcionDto.numero,
             pregunta: pregunta,
         });
-        return this.opcionRepo.save(newOpcionRespuesta);
+        return this.opcionRepository.save(newOpcionRespuesta);
     }
 };
 exports.OpcionesService = OpcionesService;
