@@ -6,6 +6,10 @@ export class CreateRespuestaOpcionDto {
     @IsNotEmpty()
     @IsInt()
     respuestaId: number; 
+
+    @IsNotEmpty()
+    @IsInt()
+    preguntaId: number; 
     
     @IsNotEmpty()
     @IsInt()

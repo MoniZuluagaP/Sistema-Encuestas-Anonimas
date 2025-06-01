@@ -13,6 +13,7 @@ exports.CreateRespuestaOpcionDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateRespuestaOpcionDto {
     respuestaId;
+    preguntaId;
     opcionId;
 }
 exports.CreateRespuestaOpcionDto = CreateRespuestaOpcionDto;
@@ -21,6 +22,11 @@ __decorate([
     (0, class_validator_1.IsInt)(),
     __metadata("design:type", Number)
 ], CreateRespuestaOpcionDto.prototype, "respuestaId", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsInt)(),
+    __metadata("design:type", Number)
+], CreateRespuestaOpcionDto.prototype, "preguntaId", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsInt)(),

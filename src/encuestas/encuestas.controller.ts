@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete,NotFoundException, } from '@nestjs/common';
 import { EncuestasService } from './encuestas.service';
 import { CreateEncuestaDto } from './dto/create-encuesta.dto';
 import { UpdateEncuestaDto } from './dto/update-encuesta.dto';
@@ -30,13 +30,23 @@ export class EncuestasController {
 
   //Los metodos siguientes los implementamos una vez tengamos todo lo demas listo para hacerlos como funcionalidades extra 
 
-  /* @Patch(':id')
+    @Patch(':id')
   update(@Param('id') id: string, @Body() updateEncuestaDto: UpdateEncuestaDto) {
     return this.encuestasService.update(+id, updateEncuestaDto);
-  } */
+  } 
 
   /* @Delete(':id')
   remove(@Param('id') id: string) {
     return this.encuestasService.remove(+id);
   } */
-}
+  @Delete(':id')
+  async removeEncuesta(@Param('id') id: string) {
+    const eliminado = await this.encuestasService.remove(+id);
+    if (!eliminado) {
+      throw new NotFoundException(`Encuesta con id ${id} no encontrada`);
+    }
+    return { mensaje: `Encuesta ${id} eliminada` };
+  }
+  }
+  
+  

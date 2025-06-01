@@ -91,10 +91,29 @@ let EncuestasService = class EncuestasService {
             preguntas: preguntasConOpcionesYRespuestas,
         };
     }
+    async update(id, updateEncuestaDto) {
+        const encuesta = await this.encuestaRepository.findOne({ where: { id } });
+        if (!encuesta) {
+            throw new common_1.NotFoundException(`Encuesta con id ${id} no encontrada`);
+        }
+        Object.assign(encuesta, updateEncuestaDto);
+        return this.encuestaRepository.save(encuesta);
+    }
+    async remove(id) {
+        const encuesta = await this.encuestaRepository.findOne({ where: { id } });
+        if (!encuesta) {
+            throw new common_1.NotFoundException(`Encuesta con id ${id} no encontrada`);
+        }
+        const respuestasArray = await this.respuestasService.obtenerPorEncuesta(id);
+        if (respuestasArray.length > 0) {
+            throw new common_1.BadRequestException(`No se puede eliminar la encuesta ${id} porque ya tiene respuestas`);
+        }
+        const result = await this.encuestaRepository.delete(id);
+        return (result.affected ?? 0) > 0;
+    }
 };
 exports.EncuestasService = EncuestasService;
 exports.EncuestasService = EncuestasService = __decorate([
-    (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(encuesta_entity_1.Encuesta)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         preguntas_service_1.PreguntasService,
