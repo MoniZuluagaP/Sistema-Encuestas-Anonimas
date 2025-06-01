@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException,BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Encuesta } from './entities/encuesta.entity';
 import { CreateEncuestaDto } from './dto/create-encuesta.dto';
+import { UpdateEncuestaDto } from './dto/update-encuesta.dto';    // ← importa el DTO
 import { PreguntasService } from 'src/preguntas/preguntas.service';
 import { OpcionesService } from 'src/opciones/opciones.service';
 import { RespuestasService } from 'src/respuestas/respuestas.service';
@@ -17,7 +18,6 @@ import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abi
 import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
 import { Opcion } from 'src/opciones/entities/opciones.entity';
 
-@Injectable()
 export class EncuestasService {
   constructor(
     @InjectRepository(Encuesta)
@@ -98,5 +98,35 @@ async findByCodigo(codigo: string): Promise<any> {
     preguntas: preguntasConOpcionesYRespuestas,
   };
 }
+async update(id: number, updateEncuestaDto: UpdateEncuestaDto): Promise<Encuesta> {
+    // 3.1) Buscamos la encuesta por su ID
+    const encuesta = await this.encuestaRepository.findOne({ where: { id } });
+    if (!encuesta) {
+      throw new NotFoundException(`Encuesta con id ${id} no encontrada`);
+    }
 
+    // 3.2) Mezclamos los campos nuevos en la entidad encontrada
+    Object.assign(encuesta, updateEncuestaDto);
+
+    // 3.3) Guardamos los cambios y devolvemos la entidad actualizada
+    return this.encuestaRepository.save(encuesta);
+  }
+async remove(id: number): Promise<boolean> {
+    // 1) Verifico que exista
+    const encuesta = await this.encuestaRepository.findOne({ where: { id } });
+    if (!encuesta) {
+      throw new NotFoundException(`Encuesta con id ${id} no encontrada`);
+    }
+
+    // 2) Verifico si hay respuestas asociadas
+    const respuestasArray = await this.respuestasService.obtenerPorEncuesta(id);
+if (respuestasArray.length > 0) {
+  throw new BadRequestException(
+    `No se puede eliminar la encuesta ${id} porque ya tiene respuestas`
+  );
 }
+    // 3) Si no hay respuestas, borro la encuesta
+    const result = await this.encuestaRepository.delete(id);
+    return (result.affected ?? 0) > 0;
+   } }
+

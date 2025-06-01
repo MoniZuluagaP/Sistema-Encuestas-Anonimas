@@ -6,10 +6,23 @@ import { Respuesta } from 'src/respuestas/entities/respuesta.entity';
 import { RespuestaAbierta } from './entities/respuesta-abierta.entity';
 import { Pregunta } from 'src/preguntas/entities/pregunta.entity';
 import { Opcion } from 'src/opciones/entities/opciones.entity';
+import { RespuestasService } from 'src/respuestas/respuestas.service';
+import { Encuesta } from 'src/encuestas/entities/encuesta.entity';
+import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
+import { RespuestasController } from 'src/respuestas/respuestas.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Respuesta, RespuestaAbierta, Pregunta])],
+  imports: [TypeOrmModule.forFeature([
+        
+    RespuestaAbierta,
+     Pregunta,
+     Respuesta,
+    
+     
+  ])],
   controllers: [RespuestasAbiertasController],
-  providers: [RespuestasAbiertasService],
+  providers: [ RespuestasAbiertasService],
+  exports: [RespuestasAbiertasService],
+
 })
 export class RespuestasAbiertasModule {}

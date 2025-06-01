@@ -19,9 +19,14 @@ let RespuestasOpcionesModule = class RespuestasOpcionesModule {
 exports.RespuestasOpcionesModule = RespuestasOpcionesModule;
 exports.RespuestasOpcionesModule = RespuestasOpcionesModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([respuesta_opciones_entity_1.RespuestaOpcion, opciones_entity_1.Opcion, respuesta_entity_1.Respuesta])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([
+                respuesta_opciones_entity_1.RespuestaOpcion,
+                opciones_entity_1.Opcion,
+                respuesta_entity_1.Respuesta,
+            ])],
         controllers: [respuestas_opciones_controller_1.RespuestasOpcionesController],
         providers: [respuestas_opciones_service_1.RespuestasOpcionesService],
+        exports: [respuestas_opciones_service_1.RespuestasOpcionesService],
     })
 ], RespuestasOpcionesModule);
 //# sourceMappingURL=respuestas-opciones.module.js.map
