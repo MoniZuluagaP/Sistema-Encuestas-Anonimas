@@ -10,8 +10,7 @@ export class CreateEncuestaDto {
   @IsDateString()
   fecha_vencimiento?: string; // importante en el front controlar el formato de la fecha para poder enviarla al controller
 
-  @IsOptional()
   @IsEmail()
-  email?: string; 
-
+  @IsNotEmpty({ message: 'El email es obligatorio' })
+  email: string;
 }

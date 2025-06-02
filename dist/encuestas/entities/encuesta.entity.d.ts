@@ -9,4 +9,5 @@ export declare class Encuesta {
     email: string;
     preguntas: Pregunta[];
     respuestas: Respuesta[];
+    activa: boolean;
 }

@@ -28,6 +28,9 @@ export class Encuesta {
   @OneToMany(() => Respuesta, respuesta => respuesta.encuesta)
   respuestas: Respuesta[];
 
+  @Column({ default: true })
+  activa: boolean;
+
 }
 
 

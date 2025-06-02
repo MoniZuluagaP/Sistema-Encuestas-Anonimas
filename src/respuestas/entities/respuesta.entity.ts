@@ -3,7 +3,6 @@ import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abi
 import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
 import { Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 
-
 @Entity()
 export class Respuesta {
   @PrimaryGeneratedColumn()
