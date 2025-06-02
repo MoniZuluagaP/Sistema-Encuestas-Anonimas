@@ -16,7 +16,11 @@ exports.EncuestasController = void 0;
 const common_1 = require("@nestjs/common");
 const encuestas_service_1 = require("./encuestas.service");
 const create_encuesta_dto_1 = require("./dto/create-encuesta.dto");
+<<<<<<< HEAD
 const email_service_1 = require("../email/email.service");
+=======
+const update_encuesta_dto_1 = require("./dto/update-encuesta.dto");
+>>>>>>> fb7df1f7feedf327e177284f1bb4acf368cac1e2
 let EncuestasController = class EncuestasController {
     encuestasService;
     emailService;
@@ -38,6 +42,16 @@ let EncuestasController = class EncuestasController {
     }
     findByCodigo(codigo) {
         return this.encuestasService.findByCodigo(codigo);
+    }
+    update(id, updateEncuestaDto) {
+        return this.encuestasService.update(+id, updateEncuestaDto);
+    }
+    async removeEncuesta(id) {
+        const eliminado = await this.encuestasService.remove(+id);
+        if (!eliminado) {
+            throw new common_1.NotFoundException(`Encuesta con id ${id} no encontrada`);
+        }
+        return { mensaje: `Encuesta ${id} eliminada` };
     }
 };
 exports.EncuestasController = EncuestasController;
@@ -61,6 +75,21 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], EncuestasController.prototype, "findByCodigo", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_encuesta_dto_1.UpdateEncuestaDto]),
+    __metadata("design:returntype", void 0)
+], EncuestasController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], EncuestasController.prototype, "removeEncuesta", null);
 exports.EncuestasController = EncuestasController = __decorate([
     (0, common_1.Controller)('encuesta'),
     __metadata("design:paramtypes", [encuestas_service_1.EncuestasService,

@@ -19,9 +19,14 @@ let RespuestasAbiertasModule = class RespuestasAbiertasModule {
 exports.RespuestasAbiertasModule = RespuestasAbiertasModule;
 exports.RespuestasAbiertasModule = RespuestasAbiertasModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([respuesta_entity_1.Respuesta, respuesta_abierta_entity_1.RespuestaAbierta, pregunta_entity_1.Pregunta])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([
+                respuesta_abierta_entity_1.RespuestaAbierta,
+                pregunta_entity_1.Pregunta,
+                respuesta_entity_1.Respuesta,
+            ])],
         controllers: [respuestas_abiertas_controller_1.RespuestasAbiertasController],
         providers: [respuestas_abiertas_service_1.RespuestasAbiertasService],
+        exports: [respuestas_abiertas_service_1.RespuestasAbiertasService],
     })
 ], RespuestasAbiertasModule);
 //# sourceMappingURL=respuestas-abiertas.module.js.map

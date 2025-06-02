@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { CreateEncuestaDto } from "./dto/create-encuesta.dto";
 import { Encuesta } from "./entities/encuesta.entity";
@@ -6,8 +7,28 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { PreguntasService } from "src/preguntas/preguntas.service";
 import { OpcionesService } from "src/opciones/opciones.service";
+=======
+import { Injectable, NotFoundException,BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 
-@Injectable()
+import { Encuesta } from './entities/encuesta.entity';
+import { CreateEncuestaDto } from './dto/create-encuesta.dto';
+import { UpdateEncuestaDto } from './dto/update-encuesta.dto';    // ← importa el DTO
+import { PreguntasService } from 'src/preguntas/preguntas.service';
+import { OpcionesService } from 'src/opciones/opciones.service';
+import { RespuestasService } from 'src/respuestas/respuestas.service';
+import { RespuestasAbiertasService } from 'src/respuestas-abiertas/respuestas-abiertas.service';
+import { RespuestasOpcionesService } from 'src/respuestas-opciones/respuestas-opciones.service';
+
+import { Pregunta, TipoRespuesta } from 'src/preguntas/entities/pregunta.entity';
+import { Respuesta } from 'src/respuestas/entities/respuesta.entity';
+import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abierta.entity';
+import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
+import { Opcion } from 'src/opciones/entities/opciones.entity';
+>>>>>>> fb7df1f7feedf327e177284f1bb4acf368cac1e2
+
 export class EncuestasService {
   constructor(
     @InjectRepository(Encuesta)
@@ -109,3 +130,38 @@ export class EncuestasService {
     return `This action removes a #${id} encuesta`;
   } */
 }
+<<<<<<< HEAD
+=======
+async update(id: number, updateEncuestaDto: UpdateEncuestaDto): Promise<Encuesta> {
+    // 3.1) Buscamos la encuesta por su ID
+    const encuesta = await this.encuestaRepository.findOne({ where: { id } });
+    if (!encuesta) {
+      throw new NotFoundException(`Encuesta con id ${id} no encontrada`);
+    }
+
+    // 3.2) Mezclamos los campos nuevos en la entidad encontrada
+    Object.assign(encuesta, updateEncuestaDto);
+
+    // 3.3) Guardamos los cambios y devolvemos la entidad actualizada
+    return this.encuestaRepository.save(encuesta);
+  }
+async remove(id: number): Promise<boolean> {
+    // 1) Verifico que exista
+    const encuesta = await this.encuestaRepository.findOne({ where: { id } });
+    if (!encuesta) {
+      throw new NotFoundException(`Encuesta con id ${id} no encontrada`);
+    }
+
+    // 2) Verifico si hay respuestas asociadas
+    const respuestasArray = await this.respuestasService.obtenerPorEncuesta(id);
+if (respuestasArray.length > 0) {
+  throw new BadRequestException(
+    `No se puede eliminar la encuesta ${id} porque ya tiene respuestas`
+  );
+}
+    // 3) Si no hay respuestas, borro la encuesta
+    const result = await this.encuestaRepository.delete(id);
+    return (result.affected ?? 0) > 0;
+   } }
+
+>>>>>>> fb7df1f7feedf327e177284f1bb4acf368cac1e2
