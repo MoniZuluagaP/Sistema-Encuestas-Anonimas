@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
-import { CreateEncuestaDto } from "./dto/create-encuesta.dto";
-import { Encuesta } from "./entities/encuesta.entity";
-import { v4 as uuidv4 } from "uuid";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { PreguntasService } from "src/preguntas/preguntas.service";
-import { OpcionesService } from "src/opciones/opciones.service";
-=======
 import { Injectable, NotFoundException,BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { Encuesta } from './entities/encuesta.entity';
 import { CreateEncuestaDto } from './dto/create-encuesta.dto';
-import { UpdateEncuestaDto } from './dto/update-encuesta.dto';    // ← importa el DTO
+import { UpdateEncuestaDto } from './dto/update-encuesta.dto'; 
 import { PreguntasService } from 'src/preguntas/preguntas.service';
 import { OpcionesService } from 'src/opciones/opciones.service';
 import { RespuestasService } from 'src/respuestas/respuestas.service';
@@ -27,9 +17,10 @@ import { Respuesta } from 'src/respuestas/entities/respuesta.entity';
 import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abierta.entity';
 import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
 import { Opcion } from 'src/opciones/entities/opciones.entity';
->>>>>>> fb7df1f7feedf327e177284f1bb4acf368cac1e2
 
 export class EncuestasService {
+  encuestaRepository: any;
+  respuestasService: any;
   constructor(
     @InjectRepository(Encuesta)
     private encuestaRepo: Repository<Encuesta>,
@@ -111,28 +102,20 @@ export class EncuestasService {
 
   // Establecer o actualizar fecha de vencimiento
   async actualizarFechaVencimiento(codigo: string, fecha: Date): Promise<Encuesta> {
-    const encuesta = await this.encuestaRepo.findOne({
-      where: { codigo_resultados: codigo },
-    });
+      const encuesta = await this.encuestaRepo.findOne({
+        where: { codigo_resultados: codigo },
+      });
 
-    if (!encuesta) {
-      throw new NotFoundException("Encuesta no encontrada");
-    }
+      if (!encuesta) {
+        throw new NotFoundException("Encuesta no encontrada");
+      }
 
-    encuesta.fecha_vencimiento = fecha;
-    return this.encuestaRepo.save(encuesta);
+      encuesta.fecha_vencimiento = fecha;
+      return this.encuestaRepo.save(encuesta);
   }
-  /* update(id: number, updateEncuestaDto: UpdateEncuestaDto) {
-    return `This action updates a #${id} encuesta`;
-  } */
 
-  /* remove(id: number) {
-    return `This action removes a #${id} encuesta`;
-  } */
-}
-<<<<<<< HEAD
-=======
-async update(id: number, updateEncuestaDto: UpdateEncuestaDto): Promise<Encuesta> {
+
+  async update(id: number, updateEncuestaDto: UpdateEncuestaDto): Promise<Encuesta> {
     // 3.1) Buscamos la encuesta por su ID
     const encuesta = await this.encuestaRepository.findOne({ where: { id } });
     if (!encuesta) {
@@ -145,6 +128,7 @@ async update(id: number, updateEncuestaDto: UpdateEncuestaDto): Promise<Encuesta
     // 3.3) Guardamos los cambios y devolvemos la entidad actualizada
     return this.encuestaRepository.save(encuesta);
   }
+
 async remove(id: number): Promise<boolean> {
     // 1) Verifico que exista
     const encuesta = await this.encuestaRepository.findOne({ where: { id } });
@@ -154,14 +138,15 @@ async remove(id: number): Promise<boolean> {
 
     // 2) Verifico si hay respuestas asociadas
     const respuestasArray = await this.respuestasService.obtenerPorEncuesta(id);
-if (respuestasArray.length > 0) {
-  throw new BadRequestException(
-    `No se puede eliminar la encuesta ${id} porque ya tiene respuestas`
-  );
-}
+  if (respuestasArray.length > 0) {
+    throw new BadRequestException(
+      `No se puede eliminar la encuesta ${id} porque ya tiene respuestas`
+    );
+  }
     // 3) Si no hay respuestas, borro la encuesta
     const result = await this.encuestaRepository.delete(id);
     return (result.affected ?? 0) > 0;
-   } }
+   }
+}
+   
 
->>>>>>> fb7df1f7feedf327e177284f1bb4acf368cac1e2

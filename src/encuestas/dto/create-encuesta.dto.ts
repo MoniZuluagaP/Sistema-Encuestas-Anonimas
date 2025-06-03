@@ -10,8 +10,8 @@ export class CreateEncuestaDto {
   @IsDateString()
   fecha_vencimiento: string; // importante en el front controlar el formato de la fecha para poder enviarla al controller
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsEmail()
-  email?: string; 
+  email: string; 
 
 }

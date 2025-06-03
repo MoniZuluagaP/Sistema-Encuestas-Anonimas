@@ -1,13 +1,10 @@
-<<<<<<< HEAD
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-=======
 /* eslint-disable prettier/prettier */
 import { Controller, Get, Post, Body, Patch, Param, Delete,NotFoundException, } from '@nestjs/common';
->>>>>>> fb7df1f7feedf327e177284f1bb4acf368cac1e2
 import { EncuestasService } from './encuestas.service';
 import { CreateEncuestaDto } from './dto/create-encuesta.dto';
 import { Encuesta } from './entities/encuesta.entity';
 import { EmailService } from '../email/email.service';
+import { UpdateEncuestaDto } from './dto/update-encuesta.dto';
 
 @Controller('encuesta')
 export class EncuestasController {
