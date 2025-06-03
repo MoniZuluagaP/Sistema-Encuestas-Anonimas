@@ -22,6 +22,7 @@ const respuesta_abierta_entity_1 = require("../respuestas-abiertas/entities/resp
 const respuestas_abiertas_service_1 = require("../respuestas-abiertas/respuestas-abiertas.service");
 const respuesta_opciones_entity_1 = require("../respuestas-opciones/entities/respuesta-opciones.entity");
 const respuestas_opciones_service_1 = require("../respuestas-opciones/respuestas-opciones.service");
+const email_module_1 = require("../email/email.module");
 let EncuestasModule = class EncuestasModule {
 };
 exports.EncuestasModule = EncuestasModule;
@@ -36,6 +37,7 @@ exports.EncuestasModule = EncuestasModule = __decorate([
                 respuesta_abierta_entity_1.RespuestaAbierta,
                 respuesta_opciones_entity_1.RespuestaOpcion,
             ]),
+            email_module_1.EmailModule,
         ],
         controllers: [encuestas_controller_1.EncuestasController],
         providers: [

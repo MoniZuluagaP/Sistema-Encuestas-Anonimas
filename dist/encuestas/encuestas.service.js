@@ -14,83 +14,81 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EncuestasService = void 0;
 const common_1 = require("@nestjs/common");
+const encuesta_entity_1 = require("./entities/encuesta.entity");
+const uuid_1 = require("uuid");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const uuid_1 = require("uuid");
-const encuesta_entity_1 = require("./entities/encuesta.entity");
 const preguntas_service_1 = require("../preguntas/preguntas.service");
 const opciones_service_1 = require("../opciones/opciones.service");
-const respuestas_service_1 = require("../respuestas/respuestas.service");
-const respuestas_abiertas_service_1 = require("../respuestas-abiertas/respuestas-abiertas.service");
-const respuestas_opciones_service_1 = require("../respuestas-opciones/respuestas-opciones.service");
-const pregunta_entity_1 = require("../preguntas/entities/pregunta.entity");
 let EncuestasService = class EncuestasService {
-    encuestaRepository;
+    encuestaRepo;
     preguntasService;
     opcionService;
-    respuestasService;
-    respuestasAbiertasService;
-    respuestasOpcionesService;
-    constructor(encuestaRepository, preguntasService, opcionService, respuestasService, respuestasAbiertasService, respuestasOpcionesService) {
-        this.encuestaRepository = encuestaRepository;
+    constructor(encuestaRepo, preguntasService, opcionService) {
+        this.encuestaRepo = encuestaRepo;
         this.preguntasService = preguntasService;
         this.opcionService = opcionService;
-        this.respuestasService = respuestasService;
-        this.respuestasAbiertasService = respuestasAbiertasService;
-        this.respuestasOpcionesService = respuestasOpcionesService;
     }
     create(createEncuestaDto) {
-        const nuevaEncuesta = this.encuestaRepository.create({
+        const nuevaEncuesta = this.encuestaRepo.create({
             ...createEncuestaDto,
             codigo_respuesta: (0, uuid_1.v4)(),
             codigo_resultados: (0, uuid_1.v4)(),
         });
-        return this.encuestaRepository.save(nuevaEncuesta);
+        console.log(nuevaEncuesta);
+        return this.encuestaRepo.save(nuevaEncuesta);
     }
     async findByCodigo(codigo) {
-        const encuesta = await this.encuestaRepository.findOne({
+        const encuesta = await this.encuestaRepo.findOne({
             where: [
                 { codigo_respuesta: codigo },
                 { codigo_resultados: codigo },
             ],
         });
         if (!encuesta) {
-            throw new common_1.NotFoundException('Encuesta no encontrada');
+            throw new common_1.NotFoundException("Encuesta no encontrada");
         }
-        const mostrarRespuestas = encuesta.codigo_resultados === codigo;
-        const preguntas = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
-        const respuesta = mostrarRespuestas
-            ? await this.respuestasService.findByEncuestaId(encuesta.id)
-            : null;
-        const respuestasAbiertas = respuesta
-            ? await this.respuestasAbiertasService.findRespuestasAbiertasByRespuestaId(respuesta.id)
-            : [];
-        const respuestasOpciones = respuesta
-            ? await this.respuestasOpcionesService.findByRespuestaId(respuesta.id)
-            : [];
-        const preguntasConOpcionesYRespuestas = await Promise.all(preguntas.map(async (pregunta) => {
-            let opciones = [];
-            if (pregunta.tipo !== pregunta_entity_1.TipoRespuesta.ABIERTA) {
-                opciones = await this.opcionService.findOpcionesByPregunta(pregunta.id);
+        const esCodigoRespuesta = codigo === encuesta.codigo_respuesta;
+        const esCodigoAdmin = codigo === encuesta.codigo_resultados;
+        if (!encuesta.activa) {
+            if (esCodigoRespuesta) {
+                throw new common_1.BadRequestException("Encuesta deshabilitada");
             }
-            const respuestas = mostrarRespuestas
-                ? pregunta.tipo === pregunta_entity_1.TipoRespuesta.ABIERTA
-                    ? respuestasAbiertas.filter((respuestaAbierta) => respuestaAbierta.pregunta.id === pregunta.id)
-                    : respuestasOpciones
-                        .filter((respuestaOpcion) => respuestaOpcion.opcion.pregunta.id === pregunta.id)
-                        .map((respuestaOpcion) => respuestaOpcion.opcion)
-                : [];
-            return {
-                ...pregunta,
-                opciones,
-                respuestas,
-            };
-        }));
+        }
+        if (encuesta.fecha_vencimiento) {
+            const ahora = new Date();
+            const vencimiento = new Date(encuesta.fecha_vencimiento);
+            if (vencimiento < ahora && esCodigoRespuesta) {
+                throw new common_1.BadRequestException("Encuesta vencida");
+            }
+        }
+        const preguntas = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
         return {
             ...encuesta,
-            preguntas: preguntasConOpcionesYRespuestas,
+            preguntas,
         };
     }
+<<<<<<< HEAD
+    async actualizarEstado(codigo, activa) {
+        const encuesta = await this.encuestaRepo.findOne({
+            where: { codigo_resultados: codigo },
+        });
+        if (!encuesta) {
+            throw new common_1.NotFoundException("Encuesta no encontrada");
+        }
+        encuesta.activa = activa;
+        return this.encuestaRepo.save(encuesta);
+    }
+    async actualizarFechaVencimiento(codigo, fecha) {
+        const encuesta = await this.encuestaRepo.findOne({
+            where: { codigo_resultados: codigo },
+        });
+        if (!encuesta) {
+            throw new common_1.NotFoundException("Encuesta no encontrada");
+        }
+        encuesta.fecha_vencimiento = fecha;
+        return this.encuestaRepo.save(encuesta);
+=======
     async update(id, updateEncuestaDto) {
         const encuesta = await this.encuestaRepository.findOne({ where: { id } });
         if (!encuesta) {
@@ -110,6 +108,7 @@ let EncuestasService = class EncuestasService {
         }
         const result = await this.encuestaRepository.delete(id);
         return (result.affected ?? 0) > 0;
+>>>>>>> fb7df1f7feedf327e177284f1bb4acf368cac1e2
     }
 };
 exports.EncuestasService = EncuestasService;
@@ -117,9 +116,6 @@ exports.EncuestasService = EncuestasService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(encuesta_entity_1.Encuesta)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         preguntas_service_1.PreguntasService,
-        opciones_service_1.OpcionesService,
-        respuestas_service_1.RespuestasService,
-        respuestas_abiertas_service_1.RespuestasAbiertasService,
-        respuestas_opciones_service_1.RespuestasOpcionesService])
+        opciones_service_1.OpcionesService])
 ], EncuestasService);
 //# sourceMappingURL=encuestas.service.js.map

@@ -35,6 +35,8 @@ import { RespuestasAbiertasService } from 'src/respuestas-abiertas/respuestas-ab
 import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
 import { RespuestasOpcionesService } from 'src/respuestas-opciones/respuestas-opciones.service';
 
+import { EmailModule } from '../email/email.module'; 
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -45,6 +47,7 @@ import { RespuestasOpcionesService } from 'src/respuestas-opciones/respuestas-op
       RespuestaAbierta,
       RespuestaOpcion,
     ]),
+      EmailModule,
   ],
   controllers: [EncuestasController],
   providers: [

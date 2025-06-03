@@ -16,17 +16,29 @@ exports.EncuestasController = void 0;
 const common_1 = require("@nestjs/common");
 const encuestas_service_1 = require("./encuestas.service");
 const create_encuesta_dto_1 = require("./dto/create-encuesta.dto");
+<<<<<<< HEAD
+const email_service_1 = require("../email/email.service");
+=======
 const update_encuesta_dto_1 = require("./dto/update-encuesta.dto");
+>>>>>>> fb7df1f7feedf327e177284f1bb4acf368cac1e2
 let EncuestasController = class EncuestasController {
     encuestasService;
-    constructor(encuestasService) {
+    emailService;
+    constructor(encuestasService, emailService) {
         this.encuestasService = encuestasService;
+        this.emailService = emailService;
     }
     startEncuesta() {
         return 'ACA DEBE IRSE ARMANDO LA ENCUESTA, ESTAN LOS CAMPOS PARA COMPLETAR Y CREAR LA ENCUESTA Y EL BOTON PARA HACER';
     }
-    create(createEncuestaDto) {
-        return this.encuestasService.create(createEncuestaDto);
+    async create(createEncuestaDto) {
+        const encuestaCreada = await this.encuestasService.create(createEncuestaDto);
+        const email = createEncuestaDto.email;
+        const nombre = createEncuestaDto.nombre;
+        const codigo_respuesta = encuestaCreada.codigo_respuesta;
+        const codigo_resultados = encuestaCreada.codigo_resultados;
+        await this.emailService.enviarEnlaceEncuesta(email, nombre, codigo_respuesta, codigo_resultados);
+        return encuestaCreada;
     }
     findByCodigo(codigo) {
         return this.encuestasService.findByCodigo(codigo);
@@ -54,7 +66,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_encuesta_dto_1.CreateEncuestaDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], EncuestasController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(':codigo'),
@@ -80,6 +92,7 @@ __decorate([
 ], EncuestasController.prototype, "removeEncuesta", null);
 exports.EncuestasController = EncuestasController = __decorate([
     (0, common_1.Controller)('encuesta'),
-    __metadata("design:paramtypes", [encuestas_service_1.EncuestasService])
+    __metadata("design:paramtypes", [encuestas_service_1.EncuestasService,
+        email_service_1.EmailService])
 ], EncuestasController);
 //# sourceMappingURL=encuestas.controller.js.map

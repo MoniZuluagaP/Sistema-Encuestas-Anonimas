@@ -1,3 +1,13 @@
+<<<<<<< HEAD
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { CreateEncuestaDto } from "./dto/create-encuesta.dto";
+import { Encuesta } from "./entities/encuesta.entity";
+import { v4 as uuidv4 } from "uuid";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { PreguntasService } from "src/preguntas/preguntas.service";
+import { OpcionesService } from "src/opciones/opciones.service";
+=======
 import { Injectable, NotFoundException,BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,87 +27,111 @@ import { Respuesta } from 'src/respuestas/entities/respuesta.entity';
 import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abierta.entity';
 import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
 import { Opcion } from 'src/opciones/entities/opciones.entity';
+>>>>>>> fb7df1f7feedf327e177284f1bb4acf368cac1e2
 
 export class EncuestasService {
   constructor(
     @InjectRepository(Encuesta)
-    private encuestaRepository: Repository<Encuesta>,
+    private encuestaRepo: Repository<Encuesta>,
     private readonly preguntasService: PreguntasService,
     private readonly opcionService: OpcionesService,
-    private readonly respuestasService: RespuestasService,
-    private readonly respuestasAbiertasService: RespuestasAbiertasService,
-    private readonly respuestasOpcionesService: RespuestasOpcionesService,
   ) {}
 
-
-  //Crear una encuesta con los datos que vienen del dto y agrega los dos codigos
   create(createEncuestaDto: CreateEncuestaDto): Promise<Encuesta> {
-    const nuevaEncuesta = this.encuestaRepository.create({
+    const nuevaEncuesta = this.encuestaRepo.create({
       ...createEncuestaDto,
       codigo_respuesta: uuidv4(),
       codigo_resultados: uuidv4(),
     });
+    console.log(nuevaEncuesta);
 
-    return this.encuestaRepository.save(nuevaEncuesta);
+    return this.encuestaRepo.save(nuevaEncuesta);
   }
 
-//Busca una encuesta utilizando el codigo que viene por URL
-async findByCodigo(codigo: string): Promise<any> {
-  const encuesta: Encuesta | null = await this.encuestaRepository.findOne({
-    where: [
-      { codigo_respuesta: codigo },
-      { codigo_resultados: codigo },
-    ],
-  });
+  // Buscar encuesta por código (puede ser de respuesta o de resultados)
+  async findByCodigo(codigo: string): Promise<Encuesta> {
+    // Buscamos la encuesta con el código (respuesta o resultados)
+    const encuesta = await this.encuestaRepo.findOne({
+      where: [
+        { codigo_respuesta: codigo },
+        { codigo_resultados: codigo },
+      ],
+    });
 
-  if (!encuesta) {
-    throw new NotFoundException('Encuesta no encontrada');
-  }
+    if (!encuesta) {
+      throw new NotFoundException("Encuesta no encontrada");
+    }
 
-  const mostrarRespuestas: boolean = encuesta.codigo_resultados === codigo;
+    // Determinar tipo de código recibido
+    const esCodigoRespuesta = codigo === encuesta.codigo_respuesta;
+    const esCodigoAdmin = codigo === encuesta.codigo_resultados;
 
-  const preguntas: Pregunta[] = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
-
-  const respuesta: Respuesta | null = mostrarRespuestas
-    ? await this.respuestasService.findByEncuestaId(encuesta.id)
-    : null;
-
-  const respuestasAbiertas: RespuestaAbierta[] = respuesta
-    ? await this.respuestasAbiertasService.findRespuestasAbiertasByRespuestaId(respuesta.id)
-    : [];
-
-  const respuestasOpciones: RespuestaOpcion[] = respuesta
-    ? await this.respuestasOpcionesService.findByRespuestaId(respuesta.id)
-    : [];
-
-  const preguntasConOpcionesYRespuestas = await Promise.all(
-    preguntas.map(async (pregunta: Pregunta) => {
-      let opciones: Opcion[] = [];
-      if (pregunta.tipo !== TipoRespuesta.ABIERTA) {
-        opciones = await this.opcionService.findOpcionesByPregunta(pregunta.id);
+    // Verificar si la encuesta está activa
+    if (!encuesta.activa) {
+      // Si no está activa y es código de respuesta, no permitir acceso
+      if (esCodigoRespuesta) {
+        throw new BadRequestException("Encuesta deshabilitada");
       }
+      // Si es encuestador, permitir acceso
+    }
 
-      const respuestas = mostrarRespuestas
-        ? pregunta.tipo === TipoRespuesta.ABIERTA
-          ? respuestasAbiertas.filter((respuestaAbierta: RespuestaAbierta) => respuestaAbierta.pregunta.id === pregunta.id)
-          : respuestasOpciones
-              .filter((respuestaOpcion: RespuestaOpcion) => respuestaOpcion.opcion.pregunta.id === pregunta.id)
-              .map((respuestaOpcion: RespuestaOpcion) => respuestaOpcion.opcion)
-        : [];
+    // Verificar fecha de vencimiento
+    if (encuesta.fecha_vencimiento) {
+      const ahora = new Date();
+      const vencimiento = new Date(encuesta.fecha_vencimiento);
 
-      return {
-        ...pregunta,
-        opciones,
-        respuestas,
-      };
-    }),
-  );
+      if (vencimiento < ahora && esCodigoRespuesta) {
+        // Si está vencida y es código de respuesta, no permitir acceso
+        throw new BadRequestException("Encuesta vencida");
+      }
+    }
 
-  return {
-    ...encuesta,
-    preguntas: preguntasConOpcionesYRespuestas,
-  };
+    // Si pasó todas las validaciones, traer preguntas asociadas
+    const preguntas = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
+
+    return {
+      ...encuesta,
+      preguntas,
+    };
+  }
+
+  // Habilitar o deshabilitar una encuesta
+  async actualizarEstado(codigo: string, activa: boolean): Promise<Encuesta> {
+    const encuesta = await this.encuestaRepo.findOne({
+      where: { codigo_resultados: codigo },
+    });
+
+    if (!encuesta) {
+      throw new NotFoundException("Encuesta no encontrada");
+    }
+
+    encuesta.activa = activa;
+    return this.encuestaRepo.save(encuesta);
+  }
+
+  // Establecer o actualizar fecha de vencimiento
+  async actualizarFechaVencimiento(codigo: string, fecha: Date): Promise<Encuesta> {
+    const encuesta = await this.encuestaRepo.findOne({
+      where: { codigo_resultados: codigo },
+    });
+
+    if (!encuesta) {
+      throw new NotFoundException("Encuesta no encontrada");
+    }
+
+    encuesta.fecha_vencimiento = fecha;
+    return this.encuestaRepo.save(encuesta);
+  }
+  /* update(id: number, updateEncuestaDto: UpdateEncuestaDto) {
+    return `This action updates a #${id} encuesta`;
+  } */
+
+  /* remove(id: number) {
+    return `This action removes a #${id} encuesta`;
+  } */
 }
+<<<<<<< HEAD
+=======
 async update(id: number, updateEncuestaDto: UpdateEncuestaDto): Promise<Encuesta> {
     // 3.1) Buscamos la encuesta por su ID
     const encuesta = await this.encuestaRepository.findOne({ where: { id } });
@@ -130,3 +164,4 @@ if (respuestasArray.length > 0) {
     return (result.affected ?? 0) > 0;
    } }
 
+>>>>>>> fb7df1f7feedf327e177284f1bb4acf368cac1e2
