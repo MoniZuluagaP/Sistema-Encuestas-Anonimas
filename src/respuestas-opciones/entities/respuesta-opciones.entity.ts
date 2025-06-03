@@ -6,12 +6,16 @@ import { Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 export class RespuestaOpcion {
   @PrimaryGeneratedColumn()
   id: number;
+   
+
+  
 
   //@ManyToOne(() => Opcion, (opcion) => opcion.id)
   //opcion: Opcion;
 
   //@ManyToOne(() => Respuesta, (respuesta) => respuesta.opciones)  
   //respuesta: Respuesta;
+  
 
   @ManyToOne(() => Respuesta, respuesta => respuesta.opciones, { onDelete: 'CASCADE' })
   respuesta: Respuesta;

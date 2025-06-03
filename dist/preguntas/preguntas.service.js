@@ -19,13 +19,21 @@ const encuesta_entity_1 = require("../encuestas/entities/encuesta.entity");
 const typeorm_2 = require("typeorm");
 const pregunta_entity_1 = require("./entities/pregunta.entity");
 const opciones_service_1 = require("../opciones/opciones.service");
+const respuesta_abierta_entity_1 = require("../respuestas-abiertas/entities/respuesta-abierta.entity");
+const respuesta_opciones_entity_1 = require("../respuestas-opciones/entities/respuesta-opciones.entity");
+const typeorm_3 = require("typeorm");
+const common_2 = require("@nestjs/common");
 let PreguntasService = class PreguntasService {
     preguntaRepository;
     opcionesService;
+    respuestaAbiertaRepository;
+    respuestaOpcionRepository;
     encuestaRepository;
-    constructor(preguntaRepository, opcionesService, encuestaRepository) {
+    constructor(preguntaRepository, opcionesService, respuestaAbiertaRepository, respuestaOpcionRepository, encuestaRepository) {
         this.preguntaRepository = preguntaRepository;
         this.opcionesService = opcionesService;
+        this.respuestaAbiertaRepository = respuestaAbiertaRepository;
+        this.respuestaOpcionRepository = respuestaOpcionRepository;
         this.encuestaRepository = encuestaRepository;
     }
     async create(createPreguntaDto) {
@@ -58,20 +66,53 @@ let PreguntasService = class PreguntasService {
     findOne(id) {
         return `This action returns a #${id} pregunta`;
     }
-    update(id, updatePreguntaDto) {
-        return `This action updates a #${id} pregunta`;
+    async remove(id) {
+        const pregunta = await this.preguntaRepository.findOne({ where: { id } });
+        if (!pregunta) {
+            throw new common_1.NotFoundException(`Pregunta con ID ${id} no encontrada.`);
+        }
+        const tieneRespuestasAbiertas = await this.respuestaAbiertaRepository.count({
+            where: { pregunta: { id } },
+        });
+        const opciones = await this.opcionesService.findOpcionesByPregunta(id);
+        const opcionesIds = opciones.map(op => op.id);
+        let tieneRespuestasOpciones = 0;
+        if (opcionesIds.length > 0) {
+            tieneRespuestasOpciones = await this.respuestaOpcionRepository.count({
+                where: {
+                    opcion: { id: (0, typeorm_3.In)(opcionesIds) },
+                },
+            });
+        }
+        if (tieneRespuestasAbiertas > 0 || tieneRespuestasOpciones > 0) {
+            throw new common_2.BadRequestException('La pregunta no puede eliminarse porque tiene respuestas asociadas.');
+        }
+        await this.preguntaRepository.remove(pregunta);
     }
-    remove(id) {
-        return `This action removes a #${id} pregunta`;
+    async update(id, updateDto) {
+        const pregunta = await this.preguntaRepository.findOne({ where: { id } });
+        if (!pregunta) {
+            throw new common_1.NotFoundException(`Pregunta con ID ${id} no encontrada.`);
+        }
+        const preguntaActualizada = Object.assign(pregunta, updateDto);
+        await this.preguntaRepository.save(preguntaActualizada);
+        return {
+            message: 'Pregunta actualizada exitosamente.',
+            data: preguntaActualizada,
+        };
     }
 };
 exports.PreguntasService = PreguntasService;
 exports.PreguntasService = PreguntasService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(pregunta_entity_1.Pregunta)),
-    __param(2, (0, typeorm_1.InjectRepository)(encuesta_entity_1.Encuesta)),
+    __param(2, (0, typeorm_1.InjectRepository)(respuesta_abierta_entity_1.RespuestaAbierta)),
+    __param(3, (0, typeorm_1.InjectRepository)(respuesta_opciones_entity_1.RespuestaOpcion)),
+    __param(4, (0, typeorm_1.InjectRepository)(encuesta_entity_1.Encuesta)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         opciones_service_1.OpcionesService,
+        typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository])
 ], PreguntasService);
 //# sourceMappingURL=preguntas.service.js.map
