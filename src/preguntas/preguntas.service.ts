@@ -57,7 +57,7 @@ export class PreguntasService {
           return { ...pregunta, opciones };
         }
 
-        // Si es pregunta abierta, no se incluye el campo `opciones`
+        // Si es pregunta abierta, no se incluye el campo `opciones` para que no devuelva un array
         return { ...pregunta };
       }),
     );

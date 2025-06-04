@@ -19,13 +19,13 @@ import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opci
 import { Opcion } from 'src/opciones/entities/opciones.entity';
 
 export class EncuestasService {
-  encuestaRepository: any;
-  respuestasService: any;
+  
   constructor(
     @InjectRepository(Encuesta)
     private encuestaRepo: Repository<Encuesta>,
     private readonly preguntasService: PreguntasService,
     private readonly opcionService: OpcionesService,
+    private readonly respuestasService: RespuestasService,
   ) {}
 
   create(createEncuestaDto: CreateEncuestaDto): Promise<Encuesta> {
@@ -34,7 +34,7 @@ export class EncuestasService {
       codigo_respuesta: uuidv4(),
       codigo_resultados: uuidv4(),
     });
-    console.log(nuevaEncuesta);
+   
 
     return this.encuestaRepo.save(nuevaEncuesta);
   }
@@ -117,7 +117,7 @@ export class EncuestasService {
 
   async update(id: number, updateEncuestaDto: UpdateEncuestaDto): Promise<Encuesta> {
     // 3.1) Buscamos la encuesta por su ID
-    const encuesta = await this.encuestaRepository.findOne({ where: { id } });
+    const encuesta = await this.encuestaRepo.findOne({ where: { id } });
     if (!encuesta) {
       throw new NotFoundException(`Encuesta con id ${id} no encontrada`);
     }
@@ -126,12 +126,12 @@ export class EncuestasService {
     Object.assign(encuesta, updateEncuestaDto);
 
     // 3.3) Guardamos los cambios y devolvemos la entidad actualizada
-    return this.encuestaRepository.save(encuesta);
+    return this.encuestaRepo.save(encuesta);
   }
 
 async remove(id: number): Promise<boolean> {
     // 1) Verifico que exista
-    const encuesta = await this.encuestaRepository.findOne({ where: { id } });
+    const encuesta = await this.encuestaRepo.findOne({ where: { id } });
     if (!encuesta) {
       throw new NotFoundException(`Encuesta con id ${id} no encontrada`);
     }
@@ -144,7 +144,7 @@ async remove(id: number): Promise<boolean> {
     );
   }
     // 3) Si no hay respuestas, borro la encuesta
-    const result = await this.encuestaRepository.delete(id);
+    const result = await this.encuestaRepo.delete(id);
     return (result.affected ?? 0) > 0;
    }
 }
