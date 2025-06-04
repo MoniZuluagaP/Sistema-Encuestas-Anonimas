@@ -14,16 +14,18 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EncuestasService = void 0;
 const common_1 = require("@nestjs/common");
-const encuesta_entity_1 = require("./entities/encuesta.entity");
-const uuid_1 = require("uuid");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const uuid_1 = require("uuid");
+const encuesta_entity_1 = require("./entities/encuesta.entity");
 const preguntas_service_1 = require("../preguntas/preguntas.service");
 const opciones_service_1 = require("../opciones/opciones.service");
 let EncuestasService = class EncuestasService {
     encuestaRepo;
     preguntasService;
     opcionService;
+    encuestaRepository;
+    respuestasService;
     constructor(encuestaRepo, preguntasService, opcionService) {
         this.encuestaRepo = encuestaRepo;
         this.preguntasService = preguntasService;
@@ -68,7 +70,6 @@ let EncuestasService = class EncuestasService {
             preguntas,
         };
     }
-<<<<<<< HEAD
     async actualizarEstado(codigo, activa) {
         const encuesta = await this.encuestaRepo.findOne({
             where: { codigo_resultados: codigo },
@@ -88,7 +89,7 @@ let EncuestasService = class EncuestasService {
         }
         encuesta.fecha_vencimiento = fecha;
         return this.encuestaRepo.save(encuesta);
-=======
+    }
     async update(id, updateEncuestaDto) {
         const encuesta = await this.encuestaRepository.findOne({ where: { id } });
         if (!encuesta) {
@@ -108,7 +109,6 @@ let EncuestasService = class EncuestasService {
         }
         const result = await this.encuestaRepository.delete(id);
         return (result.affected ?? 0) > 0;
->>>>>>> fb7df1f7feedf327e177284f1bb4acf368cac1e2
     }
 };
 exports.EncuestasService = EncuestasService;

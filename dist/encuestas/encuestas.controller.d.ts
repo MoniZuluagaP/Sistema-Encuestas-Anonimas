@@ -1,8 +1,8 @@
 import { EncuestasService } from './encuestas.service';
 import { CreateEncuestaDto } from './dto/create-encuesta.dto';
-import { UpdateEncuestaDto } from './dto/update-encuesta.dto';
 import { Encuesta } from './entities/encuesta.entity';
 import { EmailService } from '../email/email.service';
+import { UpdateEncuestaDto } from './dto/update-encuesta.dto';
 export declare class EncuestasController {
     private readonly encuestasService;
     private readonly emailService;

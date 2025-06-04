@@ -16,11 +16,8 @@ exports.EncuestasController = void 0;
 const common_1 = require("@nestjs/common");
 const encuestas_service_1 = require("./encuestas.service");
 const create_encuesta_dto_1 = require("./dto/create-encuesta.dto");
-<<<<<<< HEAD
 const email_service_1 = require("../email/email.service");
-=======
 const update_encuesta_dto_1 = require("./dto/update-encuesta.dto");
->>>>>>> fb7df1f7feedf327e177284f1bb4acf368cac1e2
 let EncuestasController = class EncuestasController {
     encuestasService;
     emailService;
