@@ -31,4 +31,6 @@ export class Pregunta {
 
   @OneToMany(() => RespuestaAbierta, ra => ra.pregunta)
   respuestasAbiertas: RespuestaAbierta[];
+
+  
 }

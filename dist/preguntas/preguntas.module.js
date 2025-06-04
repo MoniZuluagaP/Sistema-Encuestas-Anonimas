@@ -14,12 +14,15 @@ const typeorm_1 = require("@nestjs/typeorm");
 const encuesta_entity_1 = require("../encuestas/entities/encuesta.entity");
 const pregunta_entity_1 = require("./entities/pregunta.entity");
 const opciones_module_1 = require("../opciones/opciones.module");
+const respuesta_abierta_entity_1 = require("../respuestas-abiertas/entities/respuesta-abierta.entity");
+const respuesta_opciones_entity_1 = require("../respuestas-opciones/entities/respuesta-opciones.entity");
 let PreguntasModule = class PreguntasModule {
 };
 exports.PreguntasModule = PreguntasModule;
 exports.PreguntasModule = PreguntasModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([pregunta_entity_1.Pregunta, encuesta_entity_1.Encuesta]), opciones_module_1.OpcionesModule],
+        imports: [typeorm_1.TypeOrmModule.forFeature([pregunta_entity_1.Pregunta, encuesta_entity_1.Encuesta, respuesta_abierta_entity_1.RespuestaAbierta,
+                respuesta_opciones_entity_1.RespuestaOpcion]), opciones_module_1.OpcionesModule],
         controllers: [preguntas_controller_1.PreguntasController],
         providers: [preguntas_service_1.PreguntasService],
         exports: [preguntas_service_1.PreguntasService]

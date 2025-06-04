@@ -26,13 +26,21 @@ export class PreguntasController {
     return this.preguntasService.findOne(+id);
   } */
 
-/*   @Patch(':id')
+  @Patch(':id')
   update(@Param('id') id: string, @Body() updatePreguntaDto: UpdatePreguntaDto) {
     return this.preguntasService.update(+id, updatePreguntaDto);
-  } */
+  } 
 
 /*   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.preguntasService.remove(+id);
   } */
-}
+ @Delete(':id')
+  async remove(@Param('id') id: number, @Body() body: any) {
+    console.log('Eliminando pregunta sin respuestas...');
+    console.log('Body recibido:', body);
+
+    await this.preguntasService.remove(id); // Espera a que se elimine
+    return { message: 'Pregunta eliminada exitosamente.' }; };
+  }
+

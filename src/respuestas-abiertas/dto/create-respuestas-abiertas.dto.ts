@@ -11,5 +11,5 @@ export class CreateRespuestaAbiertaDto {
 
   @IsNumber()
   @IsNotEmpty()
-  preguntaId: number; 
+ preguntaId: number; 
 }
