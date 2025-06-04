@@ -19,6 +19,7 @@ const respuestas_module_1 = require("./respuestas/respuestas.module");
 const typeorm_config_1 = require("./config/typeorm.config");
 const respuestas_abiertas_module_1 = require("./respuestas-abiertas/respuestas-abiertas.module");
 const respuestas_opciones_module_1 = require("./respuestas-opciones/respuestas-opciones.module");
+const email_module_1 = require("./email/email.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -36,6 +37,7 @@ exports.AppModule = AppModule = __decorate([
             preguntas_module_1.PreguntasModule,
             opciones_module_1.OpcionesModule,
             respuestas_module_1.RespuestasModule,
+            email_module_1.EmailModule,
             respuestas_abiertas_module_1.RespuestasAbiertasModule,
             respuestas_opciones_module_1.RespuestasOpcionesModule
         ],

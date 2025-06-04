@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { Encuesta } from './entities/encuesta.entity';
 import { CreateEncuestaDto } from './dto/create-encuesta.dto';
-import { UpdateEncuestaDto } from './dto/update-encuesta.dto';    // ← importa el DTO
+import { UpdateEncuestaDto } from './dto/update-encuesta.dto'; 
 import { PreguntasService } from 'src/preguntas/preguntas.service';
 import { OpcionesService } from 'src/opciones/opciones.service';
 import { RespuestasService } from 'src/respuestas/respuestas.service';
@@ -19,86 +19,103 @@ import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opci
 import { Opcion } from 'src/opciones/entities/opciones.entity';
 
 export class EncuestasService {
+  encuestaRepository: any;
+  respuestasService: any;
   constructor(
     @InjectRepository(Encuesta)
-    private encuestaRepository: Repository<Encuesta>,
+    private encuestaRepo: Repository<Encuesta>,
     private readonly preguntasService: PreguntasService,
     private readonly opcionService: OpcionesService,
-    private readonly respuestasService: RespuestasService,
-    private readonly respuestasAbiertasService: RespuestasAbiertasService,
-    private readonly respuestasOpcionesService: RespuestasOpcionesService,
   ) {}
 
-
-  //Crear una encuesta con los datos que vienen del dto y agrega los dos codigos
   create(createEncuestaDto: CreateEncuestaDto): Promise<Encuesta> {
-    const nuevaEncuesta = this.encuestaRepository.create({
+    const nuevaEncuesta = this.encuestaRepo.create({
       ...createEncuestaDto,
       codigo_respuesta: uuidv4(),
       codigo_resultados: uuidv4(),
     });
+    console.log(nuevaEncuesta);
 
-    return this.encuestaRepository.save(nuevaEncuesta);
+    return this.encuestaRepo.save(nuevaEncuesta);
   }
 
-//Busca una encuesta utilizando el codigo que viene por URL
-async findByCodigo(codigo: string): Promise<any> {
-  const encuesta: Encuesta | null = await this.encuestaRepository.findOne({
-    where: [
-      { codigo_respuesta: codigo },
-      { codigo_resultados: codigo },
-    ],
-  });
+  // Buscar encuesta por código (puede ser de respuesta o de resultados)
+  async findByCodigo(codigo: string): Promise<Encuesta> {
+    // Buscamos la encuesta con el código (respuesta o resultados)
+    const encuesta = await this.encuestaRepo.findOne({
+      where: [
+        { codigo_respuesta: codigo },
+        { codigo_resultados: codigo },
+      ],
+    });
 
-  if (!encuesta) {
-    throw new NotFoundException('Encuesta no encontrada');
+    if (!encuesta) {
+      throw new NotFoundException("Encuesta no encontrada");
+    }
+
+    // Determinar tipo de código recibido
+    const esCodigoRespuesta = codigo === encuesta.codigo_respuesta;
+    const esCodigoAdmin = codigo === encuesta.codigo_resultados;
+
+    // Verificar si la encuesta está activa
+    if (!encuesta.activa) {
+      // Si no está activa y es código de respuesta, no permitir acceso
+      if (esCodigoRespuesta) {
+        throw new BadRequestException("Encuesta deshabilitada");
+      }
+      // Si es encuestador, permitir acceso
+    }
+
+    // Verificar fecha de vencimiento
+    if (encuesta.fecha_vencimiento) {
+      const ahora = new Date();
+      const vencimiento = new Date(encuesta.fecha_vencimiento);
+
+      if (vencimiento < ahora && esCodigoRespuesta) {
+        // Si está vencida y es código de respuesta, no permitir acceso
+        throw new BadRequestException("Encuesta vencida");
+      }
+    }
+
+    // Si pasó todas las validaciones, traer preguntas asociadas
+    const preguntas = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
+
+    return {
+      ...encuesta,
+      preguntas,
+    };
   }
 
-  const mostrarRespuestas: boolean = encuesta.codigo_resultados === codigo;
+  // Habilitar o deshabilitar una encuesta
+  async actualizarEstado(codigo: string, activa: boolean): Promise<Encuesta> {
+    const encuesta = await this.encuestaRepo.findOne({
+      where: { codigo_resultados: codigo },
+    });
 
-  const preguntas: Pregunta[] = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
+    if (!encuesta) {
+      throw new NotFoundException("Encuesta no encontrada");
+    }
 
-  const respuesta: Respuesta | null = mostrarRespuestas
-    ? await this.respuestasService.findByEncuestaId(encuesta.id)
-    : null;
+    encuesta.activa = activa;
+    return this.encuestaRepo.save(encuesta);
+  }
 
-  const respuestasAbiertas: RespuestaAbierta[] = respuesta
-    ? await this.respuestasAbiertasService.findRespuestasAbiertasByRespuestaId(respuesta.id)
-    : [];
+  // Establecer o actualizar fecha de vencimiento
+  async actualizarFechaVencimiento(codigo: string, fecha: Date): Promise<Encuesta> {
+      const encuesta = await this.encuestaRepo.findOne({
+        where: { codigo_resultados: codigo },
+      });
 
-  const respuestasOpciones: RespuestaOpcion[] = respuesta
-    ? await this.respuestasOpcionesService.findByRespuestaId(respuesta.id)
-    : [];
-
-  const preguntasConOpcionesYRespuestas = await Promise.all(
-    preguntas.map(async (pregunta: Pregunta) => {
-      let opciones: Opcion[] = [];
-      if (pregunta.tipo !== TipoRespuesta.ABIERTA) {
-        opciones = await this.opcionService.findOpcionesByPregunta(pregunta.id);
+      if (!encuesta) {
+        throw new NotFoundException("Encuesta no encontrada");
       }
 
-      const respuestas = mostrarRespuestas
-        ? pregunta.tipo === TipoRespuesta.ABIERTA
-          ? respuestasAbiertas.filter((respuestaAbierta: RespuestaAbierta) => respuestaAbierta.pregunta.id === pregunta.id)
-          : respuestasOpciones
-              .filter((respuestaOpcion: RespuestaOpcion) => respuestaOpcion.opcion.pregunta.id === pregunta.id)
-              .map((respuestaOpcion: RespuestaOpcion) => respuestaOpcion.opcion)
-        : [];
+      encuesta.fecha_vencimiento = fecha;
+      return this.encuestaRepo.save(encuesta);
+  }
 
-      return {
-        ...pregunta,
-        opciones,
-        respuestas,
-      };
-    }),
-  );
 
-  return {
-    ...encuesta,
-    preguntas: preguntasConOpcionesYRespuestas,
-  };
-}
-async update(id: number, updateEncuestaDto: UpdateEncuestaDto): Promise<Encuesta> {
+  async update(id: number, updateEncuestaDto: UpdateEncuestaDto): Promise<Encuesta> {
     // 3.1) Buscamos la encuesta por su ID
     const encuesta = await this.encuestaRepository.findOne({ where: { id } });
     if (!encuesta) {
@@ -111,6 +128,7 @@ async update(id: number, updateEncuestaDto: UpdateEncuestaDto): Promise<Encuesta
     // 3.3) Guardamos los cambios y devolvemos la entidad actualizada
     return this.encuestaRepository.save(encuesta);
   }
+
 async remove(id: number): Promise<boolean> {
     // 1) Verifico que exista
     const encuesta = await this.encuestaRepository.findOne({ where: { id } });
@@ -120,13 +138,15 @@ async remove(id: number): Promise<boolean> {
 
     // 2) Verifico si hay respuestas asociadas
     const respuestasArray = await this.respuestasService.obtenerPorEncuesta(id);
-if (respuestasArray.length > 0) {
-  throw new BadRequestException(
-    `No se puede eliminar la encuesta ${id} porque ya tiene respuestas`
-  );
-}
+  if (respuestasArray.length > 0) {
+    throw new BadRequestException(
+      `No se puede eliminar la encuesta ${id} porque ya tiene respuestas`
+    );
+  }
     // 3) Si no hay respuestas, borro la encuesta
     const result = await this.encuestaRepository.delete(id);
     return (result.affected ?? 0) > 0;
-   } }
+   }
+}
+   
 

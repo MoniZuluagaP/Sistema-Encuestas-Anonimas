@@ -6,12 +6,12 @@ export class CreateEncuestaDto {
   @IsNotEmpty({message: 'La encuesta debe tener un nombre'})
   nombre: string;
 
-  @IsOptional()
+  @IsNotEmpty({message: 'Es necesario definir la fecha de vencimiento'})
   @IsDateString()
-  fecha_vencimiento?: string; // importante en el front controlar el formato de la fecha para poder enviarla al controller
+  fecha_vencimiento: string; // importante en el front controlar el formato de la fecha para poder enviarla al controller
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsEmail()
-  email?: string; 
+  email: string; 
 
 }

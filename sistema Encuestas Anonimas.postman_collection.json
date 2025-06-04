@@ -306,13 +306,16 @@
 			"response": []
 		},
 		{
-			"name": "Crear las respuestas de opcion simple o multiple de las preguntas de una encuesta",
+			"name": "Crear las respuestas con opciones seleccionadas",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"respuestaId\": 1,  //Corresponde al registro maestro donde estan todas las respuestas de una encuesta\r\n    \"opcionId\": 1   //id de la opcion de respuesta\r\n}\r\n\r\n\r\n//Datos necesarios\r\n\r\n//\"respuestaId\": number\r\n//\"opcionId\": number",
+					"raw": "{\n    \"opcionId\": 1,   \n    \"respuestaId\": 1\n}\n\n\n    // Datos necesarios\n\n    //\"opcionId\": number\n    //\"respuestaId\": number\n\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -320,14 +323,58 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/respuestas-opciones",
+					"raw": "http://localhost:3000/respuestas-opcion",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
-						"respuestas-opciones"
+						"respuestas-opcion"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar estado de encuesta (activar o desactivar)",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activa\": false\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/encuesta/:codigo_resultados/estado",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"encuesta",
+						":codigo_resultados",
+						"estado"
+					],
+					"variable": [
+						{
+							"key": "codigo_resultados",
+							"value": ""
+						}
 					]
 				}
 			},

@@ -23,12 +23,12 @@ __decorate([
     __metadata("design:type", String)
 ], CreateEncuestaDto.prototype, "nombre", void 0);
 __decorate([
-    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Es necesario definir la fecha de vencimiento' }),
     (0, class_validator_1.IsDateString)(),
     __metadata("design:type", String)
 ], CreateEncuestaDto.prototype, "fecha_vencimiento", void 0);
 __decorate([
-    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], CreateEncuestaDto.prototype, "email", void 0);

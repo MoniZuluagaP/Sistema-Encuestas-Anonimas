@@ -10,6 +10,7 @@ import { RespuestasModule } from './respuestas/respuestas.module';
 import { typeOrmConfig } from './config/typeorm.config';
 import { RespuestasAbiertasModule } from './respuestas-abiertas/respuestas-abiertas.module';
 import { RespuestasOpcionesModule } from './respuestas-opciones/respuestas-opciones.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RespuestasOpcionesModule } from './respuestas-opciones/respuestas-opcio
     PreguntasModule, 
     OpcionesModule, 
     RespuestasModule,
+    EmailModule,
     RespuestasAbiertasModule,
     RespuestasOpcionesModule],
   controllers: [AppController],

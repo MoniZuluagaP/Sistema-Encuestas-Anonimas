@@ -22,6 +22,7 @@ let Encuesta = class Encuesta {
     email;
     preguntas;
     respuestas;
+    activa;
 };
 exports.Encuesta = Encuesta;
 __decorate([
@@ -56,6 +57,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => respuesta_entity_1.Respuesta, respuesta => respuesta.encuesta),
     __metadata("design:type", Array)
 ], Encuesta.prototype, "respuestas", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], Encuesta.prototype, "activa", void 0);
 exports.Encuesta = Encuesta = __decorate([
     (0, typeorm_1.Entity)()
 ], Encuesta);
