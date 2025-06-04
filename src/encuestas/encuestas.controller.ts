@@ -41,17 +41,13 @@ export class EncuestasController {
     return this.encuestasService.findByCodigo(codigo);
   }
 
-  //Los metodos siguientes los implementamos una vez tengamos todo lo demas listo para hacerlos como funcionalidades extra 
 
     @Patch(':id')
   update(@Param('id') id: string, @Body() updateEncuestaDto: UpdateEncuestaDto) {
     return this.encuestasService.update(+id, updateEncuestaDto);
   } 
 
-  /* @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.encuestasService.remove(+id);
-  } */
+
   @Delete(':id')
   async removeEncuesta(@Param('id') id: string) {
     const eliminado = await this.encuestasService.remove(+id);

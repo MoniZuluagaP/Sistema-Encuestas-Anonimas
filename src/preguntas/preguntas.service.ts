@@ -76,11 +76,8 @@ export class PreguntasService {
     return `This action returns a #${id} pregunta`;
   }
 
-  //update(id: number, updatePreguntaDto: UpdatePreguntaDto) {
-  //  return `This action updates a #${id} pregunta`;
-  //}
 
-  // ✅ Eliminar solo si no tiene respuestas asociadas
+  //  Eliminar solo si no tiene respuestas asociadas
   
   async remove(id: number): Promise<void> {
   // 1. Buscar la pregunta

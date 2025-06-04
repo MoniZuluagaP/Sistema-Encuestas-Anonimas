@@ -21,20 +21,12 @@ export class PreguntasController {
   }
 
 
-/*   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.preguntasService.findOne(+id);
-  } */
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePreguntaDto: UpdatePreguntaDto) {
     return this.preguntasService.update(+id, updatePreguntaDto);
   } 
 
-/*   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.preguntasService.remove(+id);
-  } */
+
  @Delete(':id')
   async remove(@Param('id') id: number, @Body() body: any) {
     console.log('Eliminando pregunta sin respuestas...');
