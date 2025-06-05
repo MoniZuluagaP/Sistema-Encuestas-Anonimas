@@ -23,6 +23,8 @@ export class EncuestasService {
   constructor(
     @InjectRepository(Encuesta)
     private encuestaRepo: Repository<Encuesta>,
+    @InjectRepository(Respuesta)  
+    private readonly respuestaRepository: Repository<Respuesta>,
     private readonly preguntasService: PreguntasService,
     private readonly opcionService: OpcionesService,
     private readonly respuestasService: RespuestasService,
@@ -152,19 +154,32 @@ return {
   }
 
 
-  async update(id: number, updateEncuestaDto: UpdateEncuestaDto): Promise<Encuesta> {
-    // 3.1) Buscamos la encuesta por su ID
-    const encuesta = await this.encuestaRepo.findOne({ where: { id } });
-    if (!encuesta) {
-      throw new NotFoundException(`Encuesta con id ${id} no encontrada`);
-    }
+  
 
-    // 3.2) Mezclamos los campos nuevos en la entidad encontrada
-    Object.assign(encuesta, updateEncuestaDto);
-
-    // 3.3) Guardamos los cambios y devolvemos la entidad actualizada
-    return this.encuestaRepo.save(encuesta);
+  async update(id: number, updateDto: UpdateEncuestaDto): Promise<any> {
+  const encuesta = await this.encuestaRepo.findOne({ where: { id } });
+  if (!encuesta) {
+    throw new NotFoundException(`Encuesta con ID ${id} no encontrada.`);
   }
+
+  const cantidadRespuestas = await this.respuestaRepository.count({
+    where: { encuesta: { id } },
+  });
+
+  if (cantidadRespuestas > 0) {
+    throw new BadRequestException('La encuesta no puede modificarse porque ya tiene respuestas.');
+  }
+
+  const encuestaActualizada = Object.assign(encuesta, updateDto);
+
+  await this.encuestaRepo.save(encuestaActualizada);
+
+  return {
+    message: 'Encuesta actualizada exitosamente.',
+    data: encuestaActualizada,
+  };
+}
+
 
 async remove(id: number): Promise<boolean> {
     // 1) Verifico que exista
@@ -184,6 +199,8 @@ async remove(id: number): Promise<boolean> {
     const result = await this.encuestaRepo.delete(id);
     return (result.affected ?? 0) > 0;
    }
+
+   
 }
    
 

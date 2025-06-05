@@ -10,7 +10,7 @@ export declare class EncuestasController {
     startEncuesta(): string;
     create(createEncuestaDto: CreateEncuestaDto): Promise<Encuesta>;
     findByCodigo(codigo: string): Promise<Encuesta>;
-    update(id: string, updateEncuestaDto: UpdateEncuestaDto): Promise<Encuesta>;
+    update(id: string, updateEncuestaDto: UpdateEncuestaDto): Promise<any>;
     removeEncuesta(id: string): Promise<{
         mensaje: string;
     }>;

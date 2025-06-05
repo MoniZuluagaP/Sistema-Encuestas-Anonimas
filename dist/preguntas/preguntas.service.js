@@ -94,6 +94,22 @@ let PreguntasService = class PreguntasService {
         if (!pregunta) {
             throw new common_1.NotFoundException(`Pregunta con ID ${id} no encontrada.`);
         }
+        const tieneRespuestasAbiertas = await this.respuestaAbiertaRepository.count({
+            where: { pregunta: { id } },
+        });
+        const opciones = await this.opcionesService.findOpcionesByPregunta(id);
+        const opcionesIds = opciones.map(op => op.id);
+        let tieneRespuestasOpciones = 0;
+        if (opcionesIds.length > 0) {
+            tieneRespuestasOpciones = await this.respuestaOpcionRepository.count({
+                where: {
+                    opcion: { id: (0, typeorm_3.In)(opcionesIds) },
+                },
+            });
+        }
+        if (tieneRespuestasAbiertas > 0 || tieneRespuestasOpciones > 0) {
+            throw new common_2.BadRequestException('La pregunta no puede modificarse porque tiene respuestas asociadas.');
+        }
         const preguntaActualizada = Object.assign(pregunta, updateDto);
         await this.preguntaRepository.save(preguntaActualizada);
         return {

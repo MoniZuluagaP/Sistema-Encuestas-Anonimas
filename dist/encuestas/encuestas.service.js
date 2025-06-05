@@ -21,13 +21,16 @@ const encuesta_entity_1 = require("./entities/encuesta.entity");
 const preguntas_service_1 = require("../preguntas/preguntas.service");
 const opciones_service_1 = require("../opciones/opciones.service");
 const respuestas_service_1 = require("../respuestas/respuestas.service");
+const respuesta_entity_1 = require("../respuestas/entities/respuesta.entity");
 let EncuestasService = class EncuestasService {
     encuestaRepo;
+    respuestaRepository;
     preguntasService;
     opcionService;
     respuestasService;
-    constructor(encuestaRepo, preguntasService, opcionService, respuestasService) {
+    constructor(encuestaRepo, respuestaRepository, preguntasService, opcionService, respuestasService) {
         this.encuestaRepo = encuestaRepo;
+        this.respuestaRepository = respuestaRepository;
         this.preguntasService = preguntasService;
         this.opcionService = opcionService;
         this.respuestasService = respuestasService;
@@ -90,13 +93,23 @@ let EncuestasService = class EncuestasService {
         encuesta.fecha_vencimiento = fecha;
         return this.encuestaRepo.save(encuesta);
     }
-    async update(id, updateEncuestaDto) {
+    async update(id, updateDto) {
         const encuesta = await this.encuestaRepo.findOne({ where: { id } });
         if (!encuesta) {
-            throw new common_1.NotFoundException(`Encuesta con id ${id} no encontrada`);
+            throw new common_1.NotFoundException(`Encuesta con ID ${id} no encontrada.`);
         }
-        Object.assign(encuesta, updateEncuestaDto);
-        return this.encuestaRepo.save(encuesta);
+        const cantidadRespuestas = await this.respuestaRepository.count({
+            where: { encuesta: { id } },
+        });
+        if (cantidadRespuestas > 0) {
+            throw new common_1.BadRequestException('La encuesta no puede modificarse porque ya tiene respuestas.');
+        }
+        const encuestaActualizada = Object.assign(encuesta, updateDto);
+        await this.encuestaRepo.save(encuestaActualizada);
+        return {
+            message: 'Encuesta actualizada exitosamente.',
+            data: encuestaActualizada,
+        };
     }
     async remove(id) {
         const encuesta = await this.encuestaRepo.findOne({ where: { id } });
@@ -114,7 +127,9 @@ let EncuestasService = class EncuestasService {
 exports.EncuestasService = EncuestasService;
 exports.EncuestasService = EncuestasService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(encuesta_entity_1.Encuesta)),
+    __param(1, (0, typeorm_1.InjectRepository)(respuesta_entity_1.Respuesta)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         preguntas_service_1.PreguntasService,
         opciones_service_1.OpcionesService,
         respuestas_service_1.RespuestasService])

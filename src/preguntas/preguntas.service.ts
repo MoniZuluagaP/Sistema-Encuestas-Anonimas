@@ -127,12 +127,35 @@ async update(id: number, updateDto: UpdatePreguntaDto): Promise<any> {
     throw new NotFoundException(`Pregunta con ID ${id} no encontrada.`);
   }
 
-  // 2. Actualizar los datos
+  // 2. Verificar si tiene respuestas abiertas asociadas
+  const tieneRespuestasAbiertas = await this.respuestaAbiertaRepository.count({
+    where: { pregunta: { id } },
+  });
+
+  // 3. Verificar si tiene respuestas de opción asociadas
+  const opciones = await this.opcionesService.findOpcionesByPregunta(id);
+  const opcionesIds = opciones.map(op => op.id);
+
+  let tieneRespuestasOpciones = 0;
+  if (opcionesIds.length > 0) {
+    tieneRespuestasOpciones = await this.respuestaOpcionRepository.count({
+      where: {
+        opcion: { id: In(opcionesIds) },
+      },
+    });
+  }
+
+  // 4. Lanzar error si hay respuestas
+  if (tieneRespuestasAbiertas > 0 || tieneRespuestasOpciones > 0) {
+    throw new BadRequestException('La pregunta no puede modificarse porque tiene respuestas asociadas.');
+  }
+
+  // 5. Actualizar los datos si no hay respuestas
   const preguntaActualizada = Object.assign(pregunta, updateDto);
 
   await this.preguntaRepository.save(preguntaActualizada);
 
-  // 3. Retornar respuesta con mensaje
+  // 6. Retornar respuesta con mensaje
   return {
     message: 'Pregunta actualizada exitosamente.',
     data: preguntaActualizada,
