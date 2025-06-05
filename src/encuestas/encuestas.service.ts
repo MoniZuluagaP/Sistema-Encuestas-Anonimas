@@ -26,6 +26,8 @@ export class EncuestasService {
     private readonly preguntasService: PreguntasService,
     private readonly opcionService: OpcionesService,
     private readonly respuestasService: RespuestasService,
+    private readonly respuestasAbiertasService: RespuestasAbiertasService,
+    private readonly respuestasOpcionesService: RespuestasOpcionesService,
   ) {}
 
   create(createEncuestaDto: CreateEncuestaDto): Promise<Encuesta> {
@@ -59,11 +61,10 @@ export class EncuestasService {
 
     // Verificar si la encuesta está activa
     if (!encuesta.activa) {
-      // Si no está activa y es código de respuesta, no permitir acceso
+      // Si no está activa y es código de respuesta, no permitir acceso. Si es encuestador, permitir acceso
       if (esCodigoRespuesta) {
         throw new BadRequestException("Encuesta deshabilitada");
       }
-      // Si es encuestador, permitir acceso
     }
 
     // Verificar fecha de vencimiento
@@ -77,14 +78,50 @@ export class EncuestasService {
       }
     }
 
-    // Si pasó todas las validaciones, traer preguntas asociadas
-    const preguntas = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
+    // Si pasó todas las validaciones, traer preguntas asociadas y luego las respuestas si es para el encuestador
+    const mostrarRespuestas: boolean = esCodigoAdmin
+    const preguntas: Pregunta[]= await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
 
-    return {
-      ...encuesta,
-      preguntas,
-    };
-  }
+    const respuesta: Respuesta | null = mostrarRespuestas
+    ? await this.respuestasService.findByEncuestaId(encuesta.id)
+    : null;
+
+  const respuestasAbiertas: RespuestaAbierta[] = respuesta
+    ? await this.respuestasAbiertasService.findRespuestasAbiertasByRespuestaId(respuesta.id)
+    : [];
+
+  const respuestasOpciones: RespuestaOpcion[] = respuesta
+    ? await this.respuestasOpcionesService.findByRespuestaId(respuesta.id)
+    : [];
+
+  const preguntasConOpcionesYRespuestas = await Promise.all(
+    preguntas.map(async (pregunta: Pregunta) => {
+      let opciones: Opcion[] = [];
+      if (pregunta.tipo !== TipoRespuesta.ABIERTA) {
+        opciones = await this.opcionService.findOpcionesByPregunta(pregunta.id);
+      }
+
+      const respuestas = mostrarRespuestas
+        ? pregunta.tipo === TipoRespuesta.ABIERTA
+          ? respuestasAbiertas.filter((respuestaAbierta: RespuestaAbierta) => respuestaAbierta.pregunta.id === pregunta.id)
+          : respuestasOpciones
+              .filter((respuestaOpcion: RespuestaOpcion) => respuestaOpcion.opcion.pregunta.id === pregunta.id)
+              .map((respuestaOpcion: RespuestaOpcion) => respuestaOpcion.opcion)
+        : [];
+
+return {
+        ...pregunta,
+        opciones,
+        respuestas,
+      };
+    }),
+  );
+
+  return {
+    ...encuesta,
+    preguntas: preguntasConOpcionesYRespuestas,
+  };
+}
 
   // Habilitar o deshabilitar una encuesta
   async actualizarEstado(codigo: string, activa: boolean): Promise<Encuesta> {
