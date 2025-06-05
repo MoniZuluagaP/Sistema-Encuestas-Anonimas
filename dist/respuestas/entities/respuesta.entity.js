@@ -26,7 +26,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Respuesta.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => encuesta_entity_1.Encuesta, encuesta => encuesta.respuestas, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.ManyToOne)(() => encuesta_entity_1.Encuesta, (encuesta) => encuesta.id),
     __metadata("design:type", encuesta_entity_1.Encuesta)
 ], Respuesta.prototype, "encuesta", void 0);
 __decorate([

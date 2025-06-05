@@ -20,16 +20,17 @@ const uuid_1 = require("uuid");
 const encuesta_entity_1 = require("./entities/encuesta.entity");
 const preguntas_service_1 = require("../preguntas/preguntas.service");
 const opciones_service_1 = require("../opciones/opciones.service");
+const respuestas_service_1 = require("../respuestas/respuestas.service");
 let EncuestasService = class EncuestasService {
     encuestaRepo;
     preguntasService;
     opcionService;
-    encuestaRepository;
     respuestasService;
-    constructor(encuestaRepo, preguntasService, opcionService) {
+    constructor(encuestaRepo, preguntasService, opcionService, respuestasService) {
         this.encuestaRepo = encuestaRepo;
         this.preguntasService = preguntasService;
         this.opcionService = opcionService;
+        this.respuestasService = respuestasService;
     }
     create(createEncuestaDto) {
         const nuevaEncuesta = this.encuestaRepo.create({
@@ -37,7 +38,6 @@ let EncuestasService = class EncuestasService {
             codigo_respuesta: (0, uuid_1.v4)(),
             codigo_resultados: (0, uuid_1.v4)(),
         });
-        console.log(nuevaEncuesta);
         return this.encuestaRepo.save(nuevaEncuesta);
     }
     async findByCodigo(codigo) {
@@ -91,15 +91,15 @@ let EncuestasService = class EncuestasService {
         return this.encuestaRepo.save(encuesta);
     }
     async update(id, updateEncuestaDto) {
-        const encuesta = await this.encuestaRepository.findOne({ where: { id } });
+        const encuesta = await this.encuestaRepo.findOne({ where: { id } });
         if (!encuesta) {
             throw new common_1.NotFoundException(`Encuesta con id ${id} no encontrada`);
         }
         Object.assign(encuesta, updateEncuestaDto);
-        return this.encuestaRepository.save(encuesta);
+        return this.encuestaRepo.save(encuesta);
     }
     async remove(id) {
-        const encuesta = await this.encuestaRepository.findOne({ where: { id } });
+        const encuesta = await this.encuestaRepo.findOne({ where: { id } });
         if (!encuesta) {
             throw new common_1.NotFoundException(`Encuesta con id ${id} no encontrada`);
         }
@@ -107,7 +107,7 @@ let EncuestasService = class EncuestasService {
         if (respuestasArray.length > 0) {
             throw new common_1.BadRequestException(`No se puede eliminar la encuesta ${id} porque ya tiene respuestas`);
         }
-        const result = await this.encuestaRepository.delete(id);
+        const result = await this.encuestaRepo.delete(id);
         return (result.affected ?? 0) > 0;
     }
 };
@@ -116,6 +116,7 @@ exports.EncuestasService = EncuestasService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(encuesta_entity_1.Encuesta)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         preguntas_service_1.PreguntasService,
-        opciones_service_1.OpcionesService])
+        opciones_service_1.OpcionesService,
+        respuestas_service_1.RespuestasService])
 ], EncuestasService);
 //# sourceMappingURL=encuestas.service.js.map

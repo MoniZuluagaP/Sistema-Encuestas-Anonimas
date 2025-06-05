@@ -8,11 +8,11 @@ export class Respuesta {
   @PrimaryGeneratedColumn()
   id: number;
 
-  //@ManyToOne(() => Encuesta, (encuesta) => encuesta.id)
-  //encuesta: Encuesta;
-
-  @ManyToOne(() => Encuesta, encuesta => encuesta.respuestas, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Encuesta, (encuesta) => encuesta.id)
   encuesta: Encuesta;
+
+  //@ManyToOne(() => Encuesta, encuesta => encuesta.respuestas, { onDelete: 'CASCADE' })
+  //encuesta: Encuesta;
 
   @OneToMany(() => RespuestaAbierta, (ra) => ra.respuesta)
   abiertas: RespuestaAbierta[];

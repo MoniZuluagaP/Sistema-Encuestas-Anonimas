@@ -10,6 +10,7 @@ import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abi
 import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
 import { In } from 'typeorm';
 import { BadRequestException } from '@nestjs/common';
+
 @Injectable()
 export class PreguntasService {
   constructor(
@@ -25,6 +26,8 @@ export class PreguntasService {
 
     @InjectRepository(Encuesta)
     private readonly encuestaRepository: Repository<Encuesta>,
+
+    
   ) {}
   
   //Crear una pregunta y asignarla a la encuesta segun el Id 

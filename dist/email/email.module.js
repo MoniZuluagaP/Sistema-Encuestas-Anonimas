@@ -33,6 +33,9 @@ exports.EmailModule = EmailModule = __decorate([
                                 user: config.get('EMAIL_USER'),
                                 pass: config.get('EMAIL_PASS'),
                             },
+                            tls: {
+                                rejectUnauthorized: false,
+                            },
                         },
                         defaults: {
                             from: `"No Reply" <${config.get('EMAIL_USER')}>`,
