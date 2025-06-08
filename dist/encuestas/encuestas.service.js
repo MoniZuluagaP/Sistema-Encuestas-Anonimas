@@ -21,6 +21,9 @@ const encuesta_entity_1 = require("./entities/encuesta.entity");
 const preguntas_service_1 = require("../preguntas/preguntas.service");
 const opciones_service_1 = require("../opciones/opciones.service");
 const respuestas_service_1 = require("../respuestas/respuestas.service");
+const respuestas_abiertas_service_1 = require("../respuestas-abiertas/respuestas-abiertas.service");
+const respuestas_opciones_service_1 = require("../respuestas-opciones/respuestas-opciones.service");
+const pregunta_entity_1 = require("../preguntas/entities/pregunta.entity");
 const respuesta_entity_1 = require("../respuestas/entities/respuesta.entity");
 let EncuestasService = class EncuestasService {
     encuestaRepo;
@@ -28,12 +31,16 @@ let EncuestasService = class EncuestasService {
     preguntasService;
     opcionService;
     respuestasService;
-    constructor(encuestaRepo, respuestaRepository, preguntasService, opcionService, respuestasService) {
+    respuestasAbiertasService;
+    respuestasOpcionesService;
+    constructor(encuestaRepo, respuestaRepository, preguntasService, opcionService, respuestasService, respuestasAbiertasService, respuestasOpcionesService) {
         this.encuestaRepo = encuestaRepo;
         this.respuestaRepository = respuestaRepository;
         this.preguntasService = preguntasService;
         this.opcionService = opcionService;
         this.respuestasService = respuestasService;
+        this.respuestasAbiertasService = respuestasAbiertasService;
+        this.respuestasOpcionesService = respuestasOpcionesService;
     }
     create(createEncuestaDto) {
         const nuevaEncuesta = this.encuestaRepo.create({
@@ -67,10 +74,38 @@ let EncuestasService = class EncuestasService {
                 throw new common_1.BadRequestException("Encuesta vencida");
             }
         }
+        const mostrarRespuestas = esCodigoAdmin;
         const preguntas = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
+        const respuesta = mostrarRespuestas
+            ? await this.respuestasService.findByEncuestaId(encuesta.id)
+            : null;
+        const respuestasAbiertas = respuesta
+            ? await this.respuestasAbiertasService.findRespuestasAbiertasByRespuestaId(respuesta.id)
+            : [];
+        const respuestasOpciones = respuesta
+            ? await this.respuestasOpcionesService.findByRespuestaId(respuesta.id)
+            : [];
+        const preguntasConOpcionesYRespuestas = await Promise.all(preguntas.map(async (pregunta) => {
+            let opciones = [];
+            if (pregunta.tipo !== pregunta_entity_1.TipoRespuesta.ABIERTA) {
+                opciones = await this.opcionService.findOpcionesByPregunta(pregunta.id);
+            }
+            const respuestas = mostrarRespuestas
+                ? pregunta.tipo === pregunta_entity_1.TipoRespuesta.ABIERTA
+                    ? respuestasAbiertas.filter((respuestaAbierta) => respuestaAbierta.pregunta.id === pregunta.id)
+                    : respuestasOpciones
+                        .filter((respuestaOpcion) => respuestaOpcion.opcion.pregunta.id === pregunta.id)
+                        .map((respuestaOpcion) => respuestaOpcion.opcion)
+                : [];
+            return {
+                ...pregunta,
+                opciones,
+                respuestas,
+            };
+        }));
         return {
             ...encuesta,
-            preguntas,
+            preguntas: preguntasConOpcionesYRespuestas,
         };
     }
     async actualizarEstado(codigo, activa) {
@@ -132,6 +167,8 @@ exports.EncuestasService = EncuestasService = __decorate([
         typeorm_2.Repository,
         preguntas_service_1.PreguntasService,
         opciones_service_1.OpcionesService,
-        respuestas_service_1.RespuestasService])
+        respuestas_service_1.RespuestasService,
+        respuestas_abiertas_service_1.RespuestasAbiertasService,
+        respuestas_opciones_service_1.RespuestasOpcionesService])
 ], EncuestasService);
 //# sourceMappingURL=encuestas.service.js.map
