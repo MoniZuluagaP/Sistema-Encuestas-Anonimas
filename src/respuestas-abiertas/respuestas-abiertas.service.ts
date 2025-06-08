@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { RespuestaAbierta } from './entities/respuesta-abierta.entity';
 import { Pregunta } from 'src/preguntas/entities/pregunta.entity';
 import { Respuesta } from 'src/respuestas/entities/respuesta.entity';
@@ -75,5 +75,13 @@ async create(createRespuestaAbiertaDto: CreateRespuestaAbiertaDto): Promise<Resp
     relations: ['pregunta'], // para saber a qué pregunta corresponde cada una
   });
 }
+
+async findRespuestasAbiertasByRespuestaIds(respuestaIds: number[]): Promise<RespuestaAbierta[]> {
+  return this.respuestaAbiertaRepository.find({
+    where: { respuesta: { id: In(respuestaIds) } },
+    relations: ['pregunta', 'respuesta'],
+  });
+}
+
 
 }

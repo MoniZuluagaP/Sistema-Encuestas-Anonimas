@@ -73,13 +73,22 @@ export class RespuestasService {
     });
   }
 
-  /**
-   * Devuelve un solo objeto Respuesta (o null) para la primera fila encontrada
-   */
+ 
+   //Devuelve un solo objeto Respuesta (o null) para la primera fila encontrada
   async findByEncuestaId(encuestaId: number): Promise<Respuesta | null> {
     return this.respuestaRepository.findOne({
       where: { encuesta: { id: encuestaId } },
       relations: ['encuesta'],
     });
   }
+
+
+  //Devuelve todos los objetos respuesta relacionados con una encuesta especifica
+  async findAllByEncuestaId(encuestaId: number): Promise<Respuesta[]> {
+  return this.respuestaRepository.find({
+    where: { encuesta: { id: encuestaId } },
+    relations: ['encuesta'],
+  });
+}
+
 }

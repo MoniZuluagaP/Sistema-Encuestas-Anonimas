@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Respuesta } from 'src/respuestas/entities/respuesta.entity';
 import { Opcion } from 'src/opciones/entities/opciones.entity';
 import { RespuestaOpcion } from './entities/respuesta-opciones.entity';
@@ -80,6 +80,13 @@ async findByRespuestaId(respuestaId: number): Promise<RespuestaOpcion[]> {
   return this.respuestaOpcionRepository.find({
     where: { respuesta: { id: respuestaId } },
     relations: ['opcion', 'opcion.pregunta'],
+  });
+}
+
+async findByRespuestaIds(respuestaIds: number[]): Promise<RespuestaOpcion[]> {
+  return this.respuestaOpcionRepository.find({
+    where: { respuesta: { id: In(respuestaIds) } },
+    relations: ['respuesta', 'opcion', 'opcion.pregunta'],
   });
 }
 

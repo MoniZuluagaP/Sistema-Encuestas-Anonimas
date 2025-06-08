@@ -43,7 +43,7 @@ export class EncuestasService {
     return this.encuestaRepo.save(nuevaEncuesta);
   }
 
-  // Buscar encuesta por código (puede ser de respuesta o de resultados)
+  /* // Buscar encuesta por código (puede ser de respuesta o de resultados)
   async findByCodigo(codigo: string): Promise<Encuesta> {
     // Buscamos la encuesta con el código (respuesta o resultados)
     const encuesta = await this.encuestaRepo.findOne({
@@ -124,6 +124,79 @@ return {
     preguntas: preguntasConOpcionesYRespuestas,
   };
 }
+ */
+
+async findByCodigo(codigo: string): Promise<Encuesta> {
+  const encuesta = await this.encuestaRepo.findOne({
+    where: [
+      { codigo_respuesta: codigo },
+      { codigo_resultados: codigo },
+    ],
+  });
+
+  if (!encuesta) {
+    throw new NotFoundException("Encuesta no encontrada");
+  }
+
+  const esCodigoRespuesta = codigo === encuesta.codigo_respuesta;
+  const esCodigoAdmin = codigo === encuesta.codigo_resultados;
+
+  if (!encuesta.activa && esCodigoRespuesta) {
+    throw new BadRequestException("Encuesta deshabilitada");
+  }
+
+  if (encuesta.fecha_vencimiento) {
+    const ahora = new Date();
+    const vencimiento = new Date(encuesta.fecha_vencimiento);
+    if (vencimiento < ahora && esCodigoRespuesta) {
+      throw new BadRequestException("Encuesta vencida");
+    }
+  }
+
+  const mostrarRespuestas = esCodigoAdmin;
+  const preguntas: Pregunta[] = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
+
+  let respuestasAbiertas: RespuestaAbierta[] = [];
+  let respuestasOpciones: RespuestaOpcion[] = [];
+
+  if (mostrarRespuestas) {
+    const respuestas: Respuesta[] = await this.respuestasService.findAllByEncuestaId(encuesta.id);
+    const respuestaIds = respuestas.map(r => r.id);
+
+    respuestasAbiertas = await this.respuestasAbiertasService.findRespuestasAbiertasByRespuestaIds(respuestaIds);
+    respuestasOpciones = await this.respuestasOpcionesService.findByRespuestaIds(respuestaIds);
+  }
+
+  const preguntasConOpcionesYRespuestas = await Promise.all(
+    preguntas.map(async (pregunta: Pregunta) => {
+      let opciones: Opcion[] = [];
+
+      if (pregunta.tipo !== TipoRespuesta.ABIERTA) {
+        opciones = await this.opcionService.findOpcionesByPregunta(pregunta.id);
+      }
+
+      const respuestas = mostrarRespuestas
+        ? pregunta.tipo === TipoRespuesta.ABIERTA
+          ? respuestasAbiertas.filter(r => r.pregunta.id === pregunta.id)
+          : respuestasOpciones
+              .filter(ro => ro.opcion.pregunta.id === pregunta.id)
+              .map(ro => ro.opcion)
+        : [];
+
+      return {
+        ...pregunta,
+        opciones,
+        respuestas,
+      };
+    }),
+  );
+
+  return {
+    ...encuesta,
+    preguntas: preguntasConOpcionesYRespuestas,
+  };
+}
+
 
   // Habilitar o deshabilitar una encuesta
   async actualizarEstado(codigo: string, activa: boolean): Promise<Encuesta> {
