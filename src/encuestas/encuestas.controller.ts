@@ -6,6 +6,7 @@ import { Encuesta } from './entities/encuesta.entity';
 import { EmailService } from '../email/email.service';
 import { UpdateEncuestaDto } from './dto/update-encuesta.dto';
 import { Response } from 'express';
+import { Res } from '@nestjs/common';
 
 @Controller('encuesta')
 export class EncuestasController {

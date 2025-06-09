@@ -90,4 +90,10 @@ async findByRespuestaIds(respuestaIds: number[]): Promise<RespuestaOpcion[]> {
   });
 }
 
+async obtenerOpcionesPorPregunta(preguntaId: number) {
+  return this.respuestaOpcionRepository.find({
+    where: { opcion: { pregunta: { id: preguntaId } } },
+    relations: ['opcion', 'respuesta'],
+  });
+}
 }

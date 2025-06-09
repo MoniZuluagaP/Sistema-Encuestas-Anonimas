@@ -18,6 +18,17 @@ import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abi
 import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
 import { Opcion } from 'src/opciones/entities/opciones.entity';
 import * as puppeteer from 'puppeteer';
+export interface ResumenPregunta {
+  pregunta: string;
+  tipo: any;
+  conteoOpciones: Record<string, number>;
+}
+
+export interface ResumenEstadistico {
+  encuesta: string;
+  fechaGeneracion: string;
+  resumen: ResumenPregunta[];
+}
 
 export class EncuestasService {
   
@@ -274,7 +285,7 @@ async remove(id: number): Promise<boolean> {
     return (result.affected ?? 0) > 0;
    }
 
- //NUEVA FUNCIÓN genera PDF
+   //NUEVA FUNCIÓN genera PDF
    async generarPDFPorCodigoResultados(codigo: string): Promise<Buffer> {
     const encuesta = await this.encuestaRepo.findOne({
       where: { codigo_resultados: codigo },
@@ -476,9 +487,3 @@ async remove(id: number): Promise<boolean> {
     return pdfBuffer;
   }
 }
-
-
-   
-}
-   
-
