@@ -17,6 +17,7 @@ import { Respuesta } from 'src/respuestas/entities/respuesta.entity';
 import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abierta.entity';
 import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
 import { Opcion } from 'src/opciones/entities/opciones.entity';
+import * as puppeteer from 'puppeteer';
 
 export class EncuestasService {
   
