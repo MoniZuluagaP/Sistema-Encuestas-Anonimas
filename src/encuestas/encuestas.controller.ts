@@ -56,6 +56,36 @@ export class EncuestasController {
     }
     return { mensaje: `Encuesta ${id} eliminada` };
   }
+
+   @Patch(':codigo/fecha-vencimiento')
+  async actualizarFechaVencimiento(
+    @Param('codigo') codigo: string,
+    @Body('fecha') fecha: string, // fecha en formato ISO desde el frontend
+  ): Promise<Encuesta> {
+    const fechaConvertida = new Date(fecha);
+    return this.encuestasService.actualizarFechaVencimiento(codigo, fechaConvertida);
   }
+
+   //Exportar encuesta en PDF
+   @Get('exportar/pdf/:codigo')
+    async exportarPDF(@Param('codigo') codigo: string, @Res() res: Response) {
+      const pdfBuffer = await this.encuestasService.generarPDFPorCodigoResultados(codigo);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=encuesta.pdf');
+      res.send(pdfBuffer);
+    }
+
+    //NUEVA FUNCIONALIDAD EXTRA: RESUMEN ESTADISTICO
+    @Get('resumen-estadistico-pdf/:codigoResultado')
+    @Header('Content-Type', 'application/pdf')
+    @Header('Content-Disposition', 'inline; filename=ResumenEstadistico.pdf')
+    async descargarPDF(
+      @Param('codigoResultado') codigoResultado: string,
+      @Res() res: Response
+    ) {
+      const pdf = await this.encuestasService.generarPDFResumenEstadisticoUnico(codigoResultado);
+      res.end(pdf);
+    }
+}
   
   
