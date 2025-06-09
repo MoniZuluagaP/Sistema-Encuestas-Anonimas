@@ -5,7 +5,7 @@ import { Pregunta, TipoRespuesta } from 'src/preguntas/entities/pregunta.entity'
 import { Opcion } from './entities/opciones.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
+import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
 @Injectable()
 export class OpcionesService {
   
@@ -15,6 +15,9 @@ export class OpcionesService {
 
     @InjectRepository(Pregunta)
     private readonly preguntaRepository: Repository<Pregunta>,
+
+    @InjectRepository(RespuestaOpcion)
+    private readonly respuestaOpcionRepository: Repository<RespuestaOpcion>,
   ) {}
   
 
@@ -71,13 +74,51 @@ export class OpcionesService {
   return this.opcionRepository.save(newOpcionRespuesta);
 }
 
+  async update(id: number, updateOpcioneDto: UpdateOpcioneDto): Promise<Opcion> {
+  const opcion = await this.opcionRepository.findOne({
+    where: { id },
+    relations: ['pregunta'],
+  });
 
-  /* update(id: number, updateOpcioneDto: UpdateOpcioneDto) {
-    return `This action updates a #${id} opcione`;
-  } */
+  if (!opcion) {
+    throw new NotFoundException('Opción no encontrada');
+  }
 
-    
-/*   remove(id: number) {
-    return `This action removes a #${id} opcione`;
-  } */
+  const respuestasUsadas = await this.respuestaOpcionRepository.count({
+    where: { opcion: { id } },
+  });
+
+  if (respuestasUsadas > 0) {
+    throw new BadRequestException(
+      'No se puede modificar la opción porque ya fue usada en respuestas.'
+    );
+  }
+
+  Object.assign(opcion, updateOpcioneDto);
+
+  return this.opcionRepository.save(opcion);
+}
+
+
+  // Eliminar una opcion de respuesta de una pregunta con tipo respuesta con opcion simple o respuesta con opcion multiple
+  async remove(id: number): Promise<void> {
+    const opcion = await this.opcionRepository.findOne({ where: { id } });
+
+    if (!opcion) {
+      throw new NotFoundException('Opción no encontrada');
+    }
+
+    const respuestasUsadas = await this.respuestaOpcionRepository.count({
+      where: { opcion: { id } },
+    });
+
+    if (respuestasUsadas > 0) {
+      throw new BadRequestException(
+        'No se puede eliminar la opción porque ya fue usada en respuestas.'
+      );
+    }
+
+    await this.opcionRepository.remove(opcion);
+  }
+ 
 }
