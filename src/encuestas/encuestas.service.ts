@@ -11,7 +11,6 @@ import { OpcionesService } from 'src/opciones/opciones.service';
 import { RespuestasService } from 'src/respuestas/respuestas.service';
 import { RespuestasAbiertasService } from 'src/respuestas-abiertas/respuestas-abiertas.service';
 import { RespuestasOpcionesService } from 'src/respuestas-opciones/respuestas-opciones.service';
-
 import { Pregunta, TipoRespuesta } from 'src/preguntas/entities/pregunta.entity';
 import { Respuesta } from 'src/respuestas/entities/respuesta.entity';
 import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abierta.entity';
@@ -22,6 +21,7 @@ export interface ResumenPregunta {
   pregunta: string;
   tipo: any;
   conteoOpciones: Record<string, number>;
+  respuestasAbiertas?: string[];
 }
 
 export interface ResumenEstadistico {
@@ -29,6 +29,7 @@ export interface ResumenEstadistico {
   fechaGeneracion: string;
   resumen: ResumenPregunta[];
 }
+
 
 export class EncuestasService {
   
@@ -204,7 +205,7 @@ async remove(id: number): Promise<boolean> {
 
 
    //NUEVA FUNCIÓN genera PDF
-   async generarPDFPorCodigoResultados(codigo: string): Promise<Buffer> {
+  async generarPDFPorCodigoResultados(codigo: string): Promise<Buffer> {
     const encuesta = await this.encuestaRepo.findOne({
       where: { codigo_resultados: codigo },
       relations: ['preguntas'],
@@ -213,6 +214,10 @@ async remove(id: number): Promise<boolean> {
     if (!encuesta) throw new NotFoundException('Encuesta no encontrada');
 
     const preguntas = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
+
+    // Obtener cantidad de encuestados
+    const respuestas = await this.respuestasService.findAllByEncuestaId(encuesta.id);
+    const cantidadEncuestados = respuestas.length;
 
     const bodyHtml = await Promise.all(
       preguntas.map(async (pregunta, index) => {
@@ -277,6 +282,7 @@ async remove(id: number): Promise<boolean> {
       </head>
       <body>
         <h1>Resultados: ${encuesta.nombre}</h1>
+        <p><strong>Cantidad de encuestados:</strong> ${cantidadEncuestados}</p>
         <p><strong>Exportado el:</strong> ${new Date().toLocaleString()}</p>
         <hr />
         ${bodyHtml.join('')}
@@ -308,10 +314,15 @@ async remove(id: number): Promise<boolean> {
 
     const preguntas = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
 
+    // Obtener cantidad de encuestados
+    const respuestas = await this.respuestasService.findAllByEncuestaId(encuesta.id);
+    const cantidadEncuestados = respuestas.length;
+
     const resumen: ResumenPregunta[] = [];
 
     for (const pregunta of preguntas) {
       const opcionesSeleccionadas = await this.respuestasOpcionesService.obtenerOpcionesPorPregunta(pregunta.id);
+      const respuestasAbiertas = await this.respuestasAbiertasService.obtenerAbiertasPorPregunta(pregunta.id);
 
       const conteoOpciones: Record<string, number> = {};
 
@@ -324,12 +335,14 @@ async remove(id: number): Promise<boolean> {
         pregunta: pregunta.texto,
         tipo: pregunta.tipo,
         conteoOpciones: Object.keys(conteoOpciones).length > 0 ? conteoOpciones : { 'Sin respuestas': 0 },
+        respuestasAbiertas: respuestasAbiertas.length > 0 ? respuestasAbiertas.map(r => r.texto) : [],
       });
     }
 
     return {
       encuesta: encuesta.nombre,
       fechaGeneracion: new Date().toISOString(),
+      cantidadEncuestados,
       resumen,
     };
   }
@@ -338,54 +351,63 @@ async remove(id: number): Promise<boolean> {
   generarHTMLConGraficos(resumenCompleto: {
     encuesta: string;
     fechaGeneracion: string;
+    cantidadEncuestados: number;
     resumen: ResumenPregunta[];
   }): string {
     return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>Resumen Estadístico</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-  <h1>Resumen Estadístico: ${resumenCompleto.encuesta}</h1>
-  <p>Generado: ${new Date(resumenCompleto.fechaGeneracion).toLocaleString()}</p>
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Resumen Estadístico</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 40px; color: #000; }
+      h3 { margin-top: 40px; }
+      ul { margin-top: 8px; padding-left: 20px; }
+      li { margin-bottom: 4px; }
+    </style>
+  </head>
+  <body>
+    <h1>Resumen Estadístico: ${resumenCompleto.encuesta}</h1>
+    <p><strong>Cantidad de encuestados:</strong> ${resumenCompleto.cantidadEncuestados}</p>
+    <p>Generado: ${new Date(resumenCompleto.fechaGeneracion).toLocaleString()}</p>
 
-  ${resumenCompleto.resumen
-    .map(
-      (pregunta, i) => `
-    <h3>${pregunta.pregunta}</h3>
-    <canvas id="chart${i}" width="400" height="200"></canvas>
-    <script>
-      const ctx${i} = document.getElementById('chart${i}').getContext('2d');
-      new Chart(ctx${i}, {
-        type: 'bar',
-        data: {
-          labels: ${JSON.stringify(Object.keys(pregunta.conteoOpciones))},
-          datasets: [{
-            label: 'Respuestas',
-            data: ${JSON.stringify(Object.values(pregunta.conteoOpciones))},
-            backgroundColor: 'rgba(54, 162, 235, 0.6)'
-          }]
-        },
-        options: {
-          responsive: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              precision: 0
-            }
-          }
+    ${resumenCompleto.resumen
+      .map((pregunta, i) => `
+        <h3>${pregunta.pregunta}</h3>
+        ${
+          pregunta.tipo === 'ABIERTA' && pregunta.respuestasAbiertas && pregunta.respuestasAbiertas.length > 0
+            ? `<strong>Respuestas abiertas:</strong>
+              <ul>
+                ${pregunta.respuestasAbiertas ? pregunta.respuestasAbiertas.map(resp => `<li>${resp}</li>`).join('') : ''}
+              </ul>`
+            : `<canvas id="chart${i}" width="400" height="200"></canvas>
+              <script>
+                const ctx${i} = document.getElementById('chart${i}').getContext('2d');
+                new Chart(ctx${i}, {
+                  type: 'bar',
+                  data: {
+                    labels: ${JSON.stringify(Object.keys(pregunta.conteoOpciones))},
+                    datasets: [{
+                      label: 'Cantidad',
+                      data: ${JSON.stringify(Object.values(pregunta.conteoOpciones))},
+                      backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                    }]
+                  },
+                  options: {
+                    responsive: false,
+                    scales: {
+                      y: { beginAtZero: true, precision: 0 }
+                    }
+                  }
+                });
+              </script>`
         }
-      });
-    </script>
-  `
-    )
-    .join('')}
+      `).join('')}
 
-</body>
-</html>
+  </body>
+  </html>
     `;
   }
 
