@@ -33,9 +33,10 @@ export class EmailService {
         throw new Error('Faltan datos requeridos para enviar el correo');
       }
 
-      const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const baseUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
       const enlaceRespuestas = `${baseUrl}/responder/${codigo_respuesta}`;
       const enlaceResultados = `${baseUrl}/resultados/${codigo_resultados}`;
+      const enlaceEditar = `${baseUrl}/encuesta/${codigo_resultados}/editar`;
 
       this.logger.log(`Generando QR para: ${enlaceRespuestas}`);
       const urlQr = await this.generarYSubirQR(enlaceRespuestas, `qr_${codigo_respuesta}_${Date.now()}`);
@@ -49,6 +50,7 @@ export class EmailService {
           nombre,
           enlaceRespuestas,
           enlaceResultados,
+          enlaceEditar,
           urlQr,
         },
       });

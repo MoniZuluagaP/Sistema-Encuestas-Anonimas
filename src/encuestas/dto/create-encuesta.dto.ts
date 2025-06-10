@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsDateString, IsEmail, IsNotEmpty } from 'class-validator';
+import { IsString, IsOptional, IsDateString, IsEmail, IsNotEmpty, IsBoolean } from 'class-validator';
 
 export class CreateEncuestaDto {
     
@@ -13,5 +13,9 @@ export class CreateEncuestaDto {
   @IsNotEmpty()
   @IsEmail()
   email: string; 
+
+  @IsOptional()
+  @IsBoolean()
+  activa:boolean;
 
 }
