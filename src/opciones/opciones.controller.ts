@@ -19,6 +19,18 @@ export class OpcionesController {
     return this.opcionesService.findOpcionesByPregunta(preguntaId);
   }
 
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateOpcioneDto: UpdateOpcioneDto) {
+  return this.opcionesService.update(+id, updateOpcioneDto);
+}
+
+
+
+   @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.opcionesService.remove(+id);
+  } 
+
   /* @Patch(':id')
   update(@Param('id') id: string, @Body() updateOpcioneDto: UpdateOpcioneDto) {
     return this.opcionesService.update(+id, updateOpcioneDto);

@@ -83,5 +83,10 @@ async findRespuestasAbiertasByRespuestaIds(respuestaIds: number[]): Promise<Resp
   });
 }
 
-
+async obtenerAbiertasPorPregunta(preguntaId: number) {
+    return this.respuestaAbiertaRepository.find({
+      where: { pregunta: { id: preguntaId } },
+      relations: ['respuesta'],
+    });
+  }
 }
