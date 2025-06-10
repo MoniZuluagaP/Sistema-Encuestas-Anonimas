@@ -16,16 +16,7 @@ export class RespuestasController {
 
   @Get('/encuesta/:id')
   findByEncuestaId(@Param('id') encuestaId: string) {
-    return this.respuestasService.findByEncuestaId(+encuestaId);
+    return this.respuestasService.findAllByEncuestaId(+encuestaId);
   }
 
-/*   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRespuestaDto: UpdateRespuestaDto) {
-    return this.respuestasService.update(+id, updateRespuestaDto);
-  } */
-
-/*   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.respuestasService.remove(+id); 
-  }*/
 }

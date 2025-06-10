@@ -83,6 +83,7 @@ async findByRespuestaId(respuestaId: number): Promise<RespuestaOpcion[]> {
   });
 }
 
+//Las respuestas de tipo opciones de todos los registros relacionados con una encuesta
 async findByRespuestaIds(respuestaIds: number[]): Promise<RespuestaOpcion[]> {
   return this.respuestaOpcionRepository.find({
     where: { respuesta: { id: In(respuestaIds) } },

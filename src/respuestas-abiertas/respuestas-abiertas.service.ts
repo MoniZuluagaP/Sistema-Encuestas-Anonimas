@@ -19,9 +19,6 @@ export class RespuestasAbiertasService {
     @InjectRepository(Respuesta)
     private readonly respuestaRepository: Repository<Respuesta>,
 
-    
-
-
   ) {}
 
   // Se crea una respuesta de tipo abierta y se guarda relacionandola con su pregunta y con el registro completo de respuestas
@@ -76,6 +73,8 @@ async create(createRespuestaAbiertaDto: CreateRespuestaAbiertaDto): Promise<Resp
   });
 }
 
+
+// Busca las respuestas abiertas de varios registros de respuestas de una encuesta
 async findRespuestasAbiertasByRespuestaIds(respuestaIds: number[]): Promise<RespuestaAbierta[]> {
   return this.respuestaAbiertaRepository.find({
     where: { respuesta: { id: In(respuestaIds) } },

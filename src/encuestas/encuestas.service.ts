@@ -55,88 +55,6 @@ export class EncuestasService {
     return this.encuestaRepo.save(nuevaEncuesta);
   }
 
-  /* // Buscar encuesta por código (puede ser de respuesta o de resultados)
-  async findByCodigo(codigo: string): Promise<Encuesta> {
-    // Buscamos la encuesta con el código (respuesta o resultados)
-    const encuesta = await this.encuestaRepo.findOne({
-      where: [
-        { codigo_respuesta: codigo },
-        { codigo_resultados: codigo },
-      ],
-    });
-
-    if (!encuesta) {
-      throw new NotFoundException("Encuesta no encontrada");
-    }
-
-    // Determinar tipo de código recibido
-    const esCodigoRespuesta = codigo === encuesta.codigo_respuesta;
-    const esCodigoAdmin = codigo === encuesta.codigo_resultados;
-
-    // Verificar si la encuesta está activa
-    if (!encuesta.activa) {
-      // Si no está activa y es código de respuesta, no permitir acceso. Si es encuestador, permitir acceso
-      if (esCodigoRespuesta) {
-        throw new BadRequestException("Encuesta deshabilitada");
-      }
-    }
-
-    // Verificar fecha de vencimiento
-    if (encuesta.fecha_vencimiento) {
-      const ahora = new Date();
-      const vencimiento = new Date(encuesta.fecha_vencimiento);
-
-      if (vencimiento < ahora && esCodigoRespuesta) {
-        // Si está vencida y es código de respuesta, no permitir acceso
-        throw new BadRequestException("Encuesta vencida");
-      }
-    }
-
-    // Si pasó todas las validaciones, traer preguntas asociadas y luego las respuestas si es para el encuestador
-    const mostrarRespuestas: boolean = esCodigoAdmin
-    const preguntas: Pregunta[]= await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
-
-    const respuesta: Respuesta | null = mostrarRespuestas
-    ? await this.respuestasService.findByEncuestaId(encuesta.id)
-    : null;
-
-  const respuestasAbiertas: RespuestaAbierta[] = respuesta
-    ? await this.respuestasAbiertasService.findRespuestasAbiertasByRespuestaId(respuesta.id)
-    : [];
-
-  const respuestasOpciones: RespuestaOpcion[] = respuesta
-    ? await this.respuestasOpcionesService.findByRespuestaId(respuesta.id)
-    : [];
-
-  const preguntasConOpcionesYRespuestas = await Promise.all(
-    preguntas.map(async (pregunta: Pregunta) => {
-      let opciones: Opcion[] = [];
-      if (pregunta.tipo !== TipoRespuesta.ABIERTA) {
-        opciones = await this.opcionService.findOpcionesByPregunta(pregunta.id);
-      }
-
-      const respuestas = mostrarRespuestas
-        ? pregunta.tipo === TipoRespuesta.ABIERTA
-          ? respuestasAbiertas.filter((respuestaAbierta: RespuestaAbierta) => respuestaAbierta.pregunta.id === pregunta.id)
-          : respuestasOpciones
-              .filter((respuestaOpcion: RespuestaOpcion) => respuestaOpcion.opcion.pregunta.id === pregunta.id)
-              .map((respuestaOpcion: RespuestaOpcion) => respuestaOpcion.opcion)
-        : [];
-
-return {
-        ...pregunta,
-        opciones,
-        respuestas,
-      };
-    }),
-  );
-
-  return {
-    ...encuesta,
-    preguntas: preguntasConOpcionesYRespuestas,
-  };
-}
- */
 
 async findByCodigo(codigo: string): Promise<Encuesta> {
   const encuesta = await this.encuestaRepo.findOne({
@@ -224,6 +142,7 @@ async findByCodigo(codigo: string): Promise<Encuesta> {
     return this.encuestaRepo.save(encuesta);
   }
 
+
   // Establecer o actualizar fecha de vencimiento
   async actualizarFechaVencimiento(codigo: string, fecha: Date): Promise<Encuesta> {
       const encuesta = await this.encuestaRepo.findOne({
@@ -238,8 +157,6 @@ async findByCodigo(codigo: string): Promise<Encuesta> {
       return this.encuestaRepo.save(encuesta);
   }
 
-
-  
 
   async update(id: number, updateDto: UpdateEncuestaDto): Promise<any> {
   const encuesta = await this.encuestaRepo.findOne({ where: { id } });
@@ -274,7 +191,7 @@ async remove(id: number): Promise<boolean> {
     }
 
     // 2) Verifico si hay respuestas asociadas
-    const respuestasArray = await this.respuestasService.obtenerPorEncuesta(id);
+    const respuestasArray = await this.respuestasService.findAllByEncuestaId(id);
   if (respuestasArray.length > 0) {
     throw new BadRequestException(
       `No se puede eliminar la encuesta ${id} porque ya tiene respuestas`
@@ -284,6 +201,7 @@ async remove(id: number): Promise<boolean> {
     const result = await this.encuestaRepo.delete(id);
     return (result.affected ?? 0) > 0;
    }
+
 
    //NUEVA FUNCIÓN genera PDF
    async generarPDFPorCodigoResultados(codigo: string): Promise<Buffer> {
@@ -376,6 +294,7 @@ async remove(id: number): Promise<boolean> {
     return Buffer.from(buffer);
   }
 
+  
   //FUNCION ADICIONAL RESUMEN ESTADISTICO
   async generarResumenEstadistico(codigoResultados: string) {
     const encuesta = await this.encuestaRepo.findOne({

@@ -62,19 +62,9 @@ export class RespuestasService {
     // 5) Devolver la entidad Respuesta principal
     return respuestaGuardada;
   }
-
-  /**
-   * Devuelve un array con todas las filas de `respuesta` asociadas a una encuesta
-   */
-  async obtenerPorEncuesta(encuestaId: number): Promise<Respuesta[]> {
-    return this.respuestaRepository.find({
-      where: { encuesta: { id: encuestaId } },
-      relations: ['encuesta'],
-    });
-  }
-
+  
  
-   //Devuelve un solo objeto Respuesta (o null) para la primera fila encontrada
+   //Devuelve un solo objeto Respuesta (o null) 
   async findByEncuestaId(encuestaId: number): Promise<Respuesta | null> {
     return this.respuestaRepository.findOne({
       where: { encuesta: { id: encuestaId } },
