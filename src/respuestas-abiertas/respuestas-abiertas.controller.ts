@@ -11,6 +11,11 @@ export class RespuestasAbiertasController {
     return this.respuestasAbiertasService.create(createDto);
   }
 
+  @Get('/:respuestaId/:preguntaId')
+  findRespuestasAbiertasByRespuestaIdYPreguntaId(@Param('respuestaId') respuestaId: number, @Param('preguntaId') preguntaId: number) {
+      return this.respuestasAbiertasService.findRespuestasAbiertasByRespuestaIdYPreguntaId(respuestaId, preguntaId);
+  }
+
   @Get('respuesta/:id')
   findRespuestasAbiertasByRespuestaId(@Param('id') encuestaId: string) {
       return this.respuestasAbiertasService.findRespuestasAbiertasByRespuestaId(+encuestaId);

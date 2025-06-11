@@ -5,7 +5,7 @@ import { Pregunta, TipoRespuesta } from 'src/preguntas/entities/pregunta.entity'
 import { Opcion } from './entities/opciones.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
+import { RespuestaOpcionSimple } from 'src/respuestas-opcion-simple/entities/respuesta-opcion-simple.entity';
 @Injectable()
 export class OpcionesService {
   
@@ -16,8 +16,8 @@ export class OpcionesService {
     @InjectRepository(Pregunta)
     private readonly preguntaRepository: Repository<Pregunta>,
 
-    @InjectRepository(RespuestaOpcion)
-    private readonly respuestaOpcionRepository: Repository<RespuestaOpcion>,
+    @InjectRepository(RespuestaOpcionSimple)
+    private readonly respuestaOpcionRepository: Repository<RespuestaOpcionSimple>,
   ) {}
   
 

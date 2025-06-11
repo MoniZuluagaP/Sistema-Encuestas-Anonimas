@@ -18,7 +18,6 @@ export class RespuestasAbiertasService {
 
     @InjectRepository(Respuesta)
     private readonly respuestaRepository: Repository<Respuesta>,
-
   ) {}
 
   // Se crea una respuesta de tipo abierta y se guarda relacionandola con su pregunta y con el registro completo de respuestas
@@ -86,6 +85,12 @@ async obtenerAbiertasPorPregunta(preguntaId: number) {
     return this.respuestaAbiertaRepository.find({
       where: { pregunta: { id: preguntaId } },
       relations: ['respuesta'],
+    });
+  }
+
+  async findRespuestasAbiertasByRespuestaIdYPreguntaId(respuestaId: number, preguntaId: number) {
+    return this.respuestaAbiertaRepository.findOne({
+      where: { respuestaId, preguntaId },
     });
   }
 }

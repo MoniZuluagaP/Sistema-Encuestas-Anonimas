@@ -1,9 +1,6 @@
 //import { IsUUID } from "class-validator";
 
-//export class CreateRespuestaDto {
-//  @IsUUID()
-//  codigoEncuesta: string;
-//} cod moni
+
 // src/respuestas/dto/create-respuesta.dto.ts
 
 import {
@@ -41,35 +38,40 @@ export class RespuestaOpcionDto {
 /**
  * DTO principal para crear todas las respuestas de una encuesta.
  */
-export class CreateRespuestaDto {
+export class CreateRespuestasDto {
   @IsUUID()
   codigoEncuesta: string;
-
-  /**
-   * Respuestas a preguntas abiertas, si las hay.
-   * Ejemplo:
-   * [
-   *   { "preguntaId": 5, "texto": "Mi respuesta" },
-   *   { "preguntaId": 6, "texto": "Otra respuesta" }
-   * ]
-   */
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => RespuestaAbiertaDto)
-  abiertas?: RespuestaAbiertaDto[];
-
-  /**
-   * Respuestas a preguntas de opción simple/múltiple, si las hay.
-   * Ejemplo:
-   * [
-   *   { "preguntaId": 8, "opcionId": 3 },
-   *   { "preguntaId": 9, "opcionId": 7 }
-   * ]
-   */
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => RespuestaOpcionDto)
-  opciones?: RespuestaOpcionDto[];
 }
+
+// export class CreateRespuestaDto {
+//   @IsUUID()
+//   codigoEncuesta: string;
+
+//   /**
+//    * Respuestas a preguntas abiertas, si las hay.
+//    * Ejemplo:
+//    * [
+//    *   { "preguntaId": 5, "texto": "Mi respuesta" },
+//    *   { "preguntaId": 6, "texto": "Otra respuesta" }
+//    * ]
+//    */
+//   @IsOptional()
+//   @IsArray()
+//   @ValidateNested({ each: true })
+//   @Type(() => RespuestaAbiertaDto)
+//   abiertas?: RespuestaAbiertaDto[];
+
+//   /**
+//    * Respuestas a preguntas de opción simple/múltiple, si las hay.
+//    * Ejemplo:
+//    * [
+//    *   { "preguntaId": 8, "opcionId": 3 },
+//    *   { "preguntaId": 9, "opcionId": 7 }
+//    * ]
+//    */
+//   @IsOptional()
+//   @IsArray()
+//   @ValidateNested({ each: true })
+//   @Type(() => RespuestaOpcionDto)
+//   opciones?: RespuestaOpcionDto[];
+// }

@@ -4,13 +4,15 @@ import { OpcionesController } from './opciones.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Pregunta } from 'src/preguntas/entities/pregunta.entity';
 import { Opcion } from './entities/opciones.entity';
-import { RespuestasOpcionesModule } from 'src/respuestas-opciones/respuestas-opciones.module';
-import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
+import { RespuestasOpcionSimpleModule } from 'src/respuestas-opcion-simple/respuesta-opcion-simple.module';
+import { RespuestaOpcionSimple } from 'src/respuestas-opcion-simple/entities/respuesta-opcion-simple.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([Opcion, Pregunta,RespuestaOpcion])
-, RespuestasOpcionesModule],
+  imports: [
+    TypeOrmModule.forFeature([Opcion, Pregunta, RespuestaOpcionSimple]),
+    RespuestasOpcionSimpleModule,
+  ],
   controllers: [OpcionesController],
   providers: [OpcionesService],
-  exports: [OpcionesService]
+  exports: [OpcionesService],
 })
 export class OpcionesModule {}

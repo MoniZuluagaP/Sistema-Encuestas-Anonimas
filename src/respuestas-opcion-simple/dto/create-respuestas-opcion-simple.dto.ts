@@ -1,8 +1,7 @@
-import { IsIn, IsInt, IsNotEmpty } from "class-validator";
+import { IsInt, IsNotEmpty } from "class-validator";
 
 
-export class CreateRespuestaOpcionDto {
-  
+export class CreateRespuestaOpcionSimpleDto {
     @IsNotEmpty()
     @IsInt()
     respuestaId: number; 

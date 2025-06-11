@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { RespuestasService } from './respuestas.service';
-import { CreateRespuestaDto } from './dto/create-respuesta.dto';
+import { CreateRespuestasDto } from './dto/create-respuesta.dto';
 
 @Controller('respuestas')
 export class RespuestasController {
@@ -9,10 +9,9 @@ export class RespuestasController {
   // Metodo con el que guardamos todas las respuestas (abiertas o cerradas) de un usuario y se relacionan a una encuesta
   // este metodo se ejecuta primero al dar enviar /guardar respuestas , para despues 
   @Post()
-  create(@Body() createRespuestaDto: CreateRespuestaDto) {
+  create(@Body() createRespuestaDto: CreateRespuestasDto) {
     return this.respuestasService.create(createRespuestaDto);
   }
-
 
   @Get('/encuesta/:id')
   findByEncuestaId(@Param('id') encuestaId: string) {

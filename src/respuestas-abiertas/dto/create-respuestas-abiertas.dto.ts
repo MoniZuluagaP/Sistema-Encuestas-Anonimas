@@ -7,9 +7,9 @@ export class CreateRespuestaAbiertaDto {
 
   @IsNumber()
   @IsNotEmpty()
-  respuestaId: number; 
+  respuestaId: number;
 
   @IsNumber()
   @IsNotEmpty()
- preguntaId: number; 
+  preguntaId: number;
 }

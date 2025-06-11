@@ -32,8 +32,8 @@ import { RespuestasService } from 'src/respuestas/respuestas.service';
 import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abierta.entity';
 import { RespuestasAbiertasService } from 'src/respuestas-abiertas/respuestas-abiertas.service';
 
-import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
-import { RespuestasOpcionesService } from 'src/respuestas-opciones/respuestas-opciones.service';
+import { RespuestaOpcionSimple } from 'src/respuestas-opcion-simple/entities/respuesta-opcion-simple.entity';
+import { RespuestasOpcionSimpleService } from 'src/respuestas-opcion-simple/respuesta-opcion-simple.service';
 
 import { EmailModule } from '../email/email.module'; 
 
@@ -45,7 +45,7 @@ import { EmailModule } from '../email/email.module';
       Opcion,
       Respuesta,
       RespuestaAbierta,
-      RespuestaOpcion,
+      RespuestaOpcionSimple,
     ]),
       EmailModule,
   ],
@@ -56,7 +56,7 @@ import { EmailModule } from '../email/email.module';
     OpcionesService,
     RespuestasService,
     RespuestasAbiertasService,
-    RespuestasOpcionesService,
+    RespuestasOpcionSimpleService,
   ],
 })
 export class EncuestasModule {}

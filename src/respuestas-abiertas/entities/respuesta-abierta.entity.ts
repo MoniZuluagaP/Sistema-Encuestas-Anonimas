@@ -10,6 +10,12 @@ export class RespuestaAbierta {
   @Column()
   texto: string;
 
+  @Column()
+  preguntaId: number;
+
+  @Column()
+  respuestaId: number;
+
   //@ManyToOne(() => Pregunta, (pregunta) => pregunta.id) 
   //pregunta: Pregunta;
 

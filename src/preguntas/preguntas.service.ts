@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { Pregunta, TipoRespuesta } from './entities/pregunta.entity';
 import { OpcionesService } from 'src/opciones/opciones.service';
 import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abierta.entity';
-import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
+import { RespuestaOpcionSimple } from 'src/respuestas-opcion-simple/entities/respuesta-opcion-simple.entity';
 import { In } from 'typeorm';
 import { BadRequestException } from '@nestjs/common';
 
@@ -21,8 +21,8 @@ export class PreguntasService {
     @InjectRepository(RespuestaAbierta)
     private readonly respuestaAbiertaRepository: Repository<RespuestaAbierta>,
 
-    @InjectRepository(RespuestaOpcion)
-    private readonly respuestaOpcionRepository: Repository<RespuestaOpcion>,
+    @InjectRepository(RespuestaOpcionSimple)
+    private readonly respuestaOpcionRepository: Repository<RespuestaOpcionSimple>,
 
     @InjectRepository(Encuesta)
     private readonly encuestaRepository: Repository<Encuesta>,

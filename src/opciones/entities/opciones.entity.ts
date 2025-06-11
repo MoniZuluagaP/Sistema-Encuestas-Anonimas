@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { Pregunta } from "src/preguntas/entities/pregunta.entity";
-import { RespuestaOpcion } from 'src/respuestas-opciones/entities/respuesta-opciones.entity';
+import { RespuestaOpcionSimple } from 'src/respuestas-opcion-simple/entities/respuesta-opcion-simple.entity';
 
 @Entity()
 export class Opcion {
@@ -19,7 +19,7 @@ export class Opcion {
   @ManyToOne(() => Pregunta, pregunta => pregunta.opciones, { onDelete: 'CASCADE' })
   pregunta: Pregunta;
 
-  @OneToMany(() => RespuestaOpcion, ro => ro.opcion)
-  respuestasOpcion: RespuestaOpcion[];
+  @OneToMany(() => RespuestaOpcionSimple, ro => ro.opcion)
+  respuestasOpcion: RespuestaOpcionSimple[];
 
 }

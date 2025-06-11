@@ -9,8 +9,9 @@ import { OpcionesModule } from './opciones/opciones.module';
 import { RespuestasModule } from './respuestas/respuestas.module';
 import { typeOrmConfig } from './config/typeorm.config';
 import { RespuestasAbiertasModule } from './respuestas-abiertas/respuestas-abiertas.module';
-import { RespuestasOpcionesModule } from './respuestas-opciones/respuestas-opciones.module';
+import { RespuestasOpcionSimpleModule } from './respuestas-opcion-simple/respuesta-opcion-simple.module';
 import { EmailModule } from './email/email.module';
+import { RespuestasOpcionMultipleModule } from './respuestas-opcion-multiple/respuesta-opcion-multiple.module';
 
 @Module({
   imports: [
@@ -19,15 +20,17 @@ import { EmailModule } from './email/email.module';
     }),
     TypeOrmModule.forRootAsync({
       useFactory: typeOrmConfig,
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
-    EncuestasModule, 
-    PreguntasModule, 
-    OpcionesModule, 
+    EncuestasModule,
+    PreguntasModule,
+    OpcionesModule,
     RespuestasModule,
     EmailModule,
     RespuestasAbiertasModule,
-    RespuestasOpcionesModule],
+    RespuestasOpcionSimpleModule,
+    RespuestasOpcionMultipleModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
