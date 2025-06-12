@@ -139,7 +139,7 @@ async findByCodigo(codigo: string): Promise<Encuesta> {
 }
 
 
-  // Habilitar o deshabilitar una encuesta
+  // Habilitar o deshabilitar una encuesta realizado por Marianela Dagatti
   async actualizarEstado(codigo: string, activa: boolean): Promise<Encuesta> {
     const encuesta = await this.encuestaRepo.findOne({
       where: { codigo_resultados: codigo },
@@ -154,7 +154,7 @@ async findByCodigo(codigo: string): Promise<Encuesta> {
   }
 
 
-  // Establecer o actualizar fecha de vencimiento
+  // Establecer o actualizar fecha de vencimiento realizado por Liria Olivera
   async actualizarFechaVencimiento(codigo: string, fecha: Date): Promise<Encuesta> {
       const encuesta = await this.encuestaRepo.findOne({
         where: { codigo_resultados: codigo },
@@ -214,7 +214,7 @@ async remove(id: number): Promise<boolean> {
    }
 
 
-   //NUEVA FUNCIÓN genera PDF
+   //NUEVA FUNCIÓN GENERAR PDF REALIZADO POR PABLO CONTRERAS
 
 async generarPDFPorCodigoResultados(codigo: string): Promise<Buffer> {
     const encuesta = await this.encuestaRepo.findOne({
@@ -234,6 +234,8 @@ async generarPDFPorCodigoResultados(codigo: string): Promise<Buffer> {
     // Obtener respuestas de opción múltiple con la función existente
     const respuestasMultiples = await this.respuestasOpcionMultipleService.findByRespuestaIds(respuestaIds);
 
+
+    //comienza a armar el html
     const bodyHtml = await Promise.all(
       preguntas.map(async (pregunta, index) => {
         const opcionesTodas = await this.opcionService.findOpcionesByPregunta(pregunta.id);
@@ -329,104 +331,8 @@ async generarPDFPorCodigoResultados(codigo: string): Promise<Buffer> {
 }
 
 
-   
-  /* async generarPDFPorCodigoResultados(codigo: string): Promise<Buffer> {
-    const encuesta = await this.encuestaRepo.findOne({
-      where: { codigo_resultados: codigo },
-      relations: ['preguntas'],
-    });
-
-    if (!encuesta) throw new NotFoundException('Encuesta no encontrada');
-
-    const preguntas = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
-
-    // Obtener cantidad de encuestados
-    const respuestas = await this.respuestasService.findAllByEncuestaId(encuesta.id);
-    const cantidadEncuestados = respuestas.length;
-
-    const bodyHtml = await Promise.all(
-      preguntas.map(async (pregunta, index) => {
-        const opcionesTodas = await this.opcionService.findOpcionesByPregunta(pregunta.id);
-        const opcionesSeleccionadas = await this.respuestasOpcionesService.obtenerOpcionesPorPregunta(pregunta.id);
-        const respuestasAbiertas = await this.respuestasAbiertasService.obtenerAbiertasPorPregunta(pregunta.id);
-
-        const opcionesHtml = opcionesTodas.length > 0 ? opcionesTodas.map(opcion => {
-          const seleccionada = opcionesSeleccionadas.some(ro => ro.opcion.id === opcion.id);
-          return `<li>${opcion.texto} ${seleccionada ? '<strong>(seleccionada)</strong>' : ''}</li>`;
-        }).join('') : '';
-
-        let respuestasHtml = '';
-
-        if (opcionesSeleccionadas.length > 0) {
-          respuestasHtml += opcionesSeleccionadas
-            .map(ro => `<div class="respuesta">• ${ro.opcion.texto}</div>`)
-            .join('');
-        }
-
-        if (pregunta.tipo === TipoRespuesta.ABIERTA && respuestasAbiertas.length > 0) {
-          respuestasHtml += respuestasAbiertas
-            .map(r => `<div class="respuesta">• ${r.texto}</div>`)
-            .join('');
-        }
-
-        if (respuestasHtml === '') {
-          respuestasHtml = '<div class="respuesta">Sin respuestas</div>';
-        }
-
-        return `
-          <div class="bloque-pregunta">
-            <h3>${index + 1}. ${pregunta.texto}</h3>
-            ${opcionesHtml ? `<strong>Opciones:</strong><ul>${opcionesHtml}</ul>` : ''}
-            <strong>Respuestas:</strong>
-            ${respuestasHtml}
-          </div>
-        `;
-      })
-    );
-
-    const html = `
-      <html>
-      <head>
-        <style>
-          body { 
-            font-family: Arial, sans-serif; 
-            margin: 40px; 
-            color: #000; 
-            background-color: #fff;
-          }
-          h1 { color: #000; }
-          .bloque-pregunta { margin-bottom: 25px; }
-          h3 { margin-bottom: 8px; }
-          ul { margin-top: 4px; margin-bottom: 10px; padding-left: 20px; }
-          li { margin-bottom: 4px; }
-          .respuesta { padding-left: 15px; margin-bottom: 3px; color: #000; }
-          strong { color: #000; }
-          .footer { margin-top: 40px; font-size: 12px; color: #555; }
-          hr { border-color: #000; }
-        </style>
-      </head>
-      <body>
-        <h1>Resultados: ${encuesta.nombre}</h1>
-        <p><strong>Cantidad de encuestados:</strong> ${cantidadEncuestados}</p>
-        <p><strong>Exportado el:</strong> ${new Date().toLocaleString()}</p>
-        <hr />
-        ${bodyHtml.join('')}
-        <div class="footer">Sistema de Encuestas Anónimas - ${new Date().getFullYear()}</div>
-      </body>
-      </html>
-    `;
-
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-    const buffer = await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true });
-    await browser.close();
-
-    return Buffer.from(buffer);
-  }
- */
   
-  //FUNCION ADICIONAL RESUMEN ESTADISTICO
+  //FUNCION ADICIONAL RESUMEN ESTADISTICO REALIZADO POR PAOLA VENTURINI
   async generarResumenEstadistico(codigoResultados: string) {
     const encuesta = await this.encuestaRepo.findOne({
       where: { codigo_resultados: codigoResultados },

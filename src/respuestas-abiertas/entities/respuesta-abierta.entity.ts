@@ -16,9 +16,6 @@ export class RespuestaAbierta {
   @Column()
   respuestaId: number;
 
-  //@ManyToOne(() => Pregunta, (pregunta) => pregunta.id) 
-  //pregunta: Pregunta;
-
   @ManyToOne(() => Pregunta, pregunta => pregunta.respuestasAbiertas, { onDelete: 'CASCADE' })
   pregunta: Pregunta;
 

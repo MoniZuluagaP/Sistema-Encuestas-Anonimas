@@ -22,6 +22,7 @@ export class EmailService {
     }
   }
 
+  //Servicio que se inyecta en encuestas.service para enviar mail cuando se hace create de Encuesta realizado por Monica Zuluaga
   async enviarEnlaceEncuesta(
     email: string,
     nombre: string,
@@ -62,6 +63,7 @@ export class EmailService {
     }
   }
 
+  //Funcion adicional realizada por Esteban Herrero
   private async generarYSubirQR(url: string, nombreArchivo: string): Promise<string> {
     const qrCodeDataUrl = await QRCode.toDataURL(url);
     const base64Str = qrCodeDataUrl.replace(/^data:image\/png;base64,/, '');

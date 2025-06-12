@@ -1,7 +1,3 @@
-//import { IsUUID } from "class-validator";
-
-
-// src/respuestas/dto/create-respuesta.dto.ts
 
 import {
   IsUUID,
@@ -43,35 +39,3 @@ export class CreateRespuestasDto {
   codigoEncuesta: string;
 }
 
-// export class CreateRespuestaDto {
-//   @IsUUID()
-//   codigoEncuesta: string;
-
-//   /**
-//    * Respuestas a preguntas abiertas, si las hay.
-//    * Ejemplo:
-//    * [
-//    *   { "preguntaId": 5, "texto": "Mi respuesta" },
-//    *   { "preguntaId": 6, "texto": "Otra respuesta" }
-//    * ]
-//    */
-//   @IsOptional()
-//   @IsArray()
-//   @ValidateNested({ each: true })
-//   @Type(() => RespuestaAbiertaDto)
-//   abiertas?: RespuestaAbiertaDto[];
-
-//   /**
-//    * Respuestas a preguntas de opción simple/múltiple, si las hay.
-//    * Ejemplo:
-//    * [
-//    *   { "preguntaId": 8, "opcionId": 3 },
-//    *   { "preguntaId": 9, "opcionId": 7 }
-//    * ]
-//    */
-//   @IsOptional()
-//   @IsArray()
-//   @ValidateNested({ each: true })
-//   @Type(() => RespuestaOpcionDto)
-//   opciones?: RespuestaOpcionDto[];
-// }

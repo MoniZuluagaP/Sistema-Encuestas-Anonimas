@@ -13,9 +13,6 @@ export class Opcion {
   @Column()
   numero: number;
 
-  //@ManyToOne(() => Pregunta, (pregunta) => pregunta.id, { onDelete: 'CASCADE' })
-  //pregunta: Pregunta;
-
   @ManyToOne(() => Pregunta, pregunta => pregunta.opciones, { onDelete: 'CASCADE' })
   pregunta: Pregunta;
 
