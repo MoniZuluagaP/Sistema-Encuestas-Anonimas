@@ -215,7 +215,122 @@ async remove(id: number): Promise<boolean> {
 
 
    //NUEVA FUNCIÓN genera PDF
-  async generarPDFPorCodigoResultados(codigo: string): Promise<Buffer> {
+
+async generarPDFPorCodigoResultados(codigo: string): Promise<Buffer> {
+    const encuesta = await this.encuestaRepo.findOne({
+      where: { codigo_resultados: codigo },
+      relations: ['preguntas'],
+    });
+
+    if (!encuesta) throw new NotFoundException('Encuesta no encontrada');
+
+    const preguntas = await this.preguntasService.obtenerPreguntasPorEncuesta(encuesta.id);
+
+    // Obtener cantidad de encuestados
+    const respuestas = await this.respuestasService.findAllByEncuestaId(encuesta.id);
+    const cantidadEncuestados = respuestas.length;
+    const respuestaIds = respuestas.map(r => r.id);
+
+    // Obtener respuestas de opción múltiple con la función existente
+    const respuestasMultiples = await this.respuestasOpcionMultipleService.findByRespuestaIds(respuestaIds);
+
+    const bodyHtml = await Promise.all(
+      preguntas.map(async (pregunta, index) => {
+        const opcionesTodas = await this.opcionService.findOpcionesByPregunta(pregunta.id);
+        const opcionesSeleccionadas = await this.respuestasOpcionesService.obtenerOpcionesPorPregunta(pregunta.id);
+        const respuestasAbiertas = await this.respuestasAbiertasService.obtenerAbiertasPorPregunta(pregunta.id);
+
+        const opcionesHtml = opcionesTodas.length > 0 ? opcionesTodas.map(opcion => {
+          const seleccionada = opcionesSeleccionadas.some(ro => ro.opcion.id === opcion.id);
+          return `<li>${opcion.texto} ${seleccionada ? '<strong>(seleccionada)</strong>' : ''}</li>`;
+        }).join('') : '';
+
+        let respuestasHtml = '';
+
+        if (opcionesSeleccionadas.length > 0) {
+          respuestasHtml += opcionesSeleccionadas
+            .map(ro => `<div class="respuesta">• ${ro.opcion.texto}</div>`)
+            .join('');
+        }
+
+        if (pregunta.tipo === TipoRespuesta.ABIERTA && respuestasAbiertas.length > 0) {
+          respuestasHtml += respuestasAbiertas
+            .map(r => `<div class="respuesta">• ${r.texto}</div>`)
+            .join('');
+        }
+
+        if (pregunta.tipo === TipoRespuesta.OPCION_MULTIPLE) {
+          const respuestasFiltradas = respuestasMultiples.filter(ro => ro.preguntaId === pregunta.id);
+
+          if (respuestasFiltradas.length > 0) {
+            respuestasHtml += respuestasFiltradas
+              .map(ro => {
+                const opcionesTexto = ro.opciones.map(opcion => opcion.texto).join(' - ');
+                return `<div class="respuesta">• ${opcionesTexto}</div>`;
+              })
+              .join('');
+          }
+        }
+
+        if (respuestasHtml === '') {
+          respuestasHtml = '<div class="respuesta">Sin respuestas</div>';
+        }
+
+        return `
+          <div class="bloque-pregunta">
+            <h3>${index + 1}. ${pregunta.texto}</h3>
+            ${opcionesHtml ? `<strong>Opciones:</strong><ul>${opcionesHtml}</ul>` : ''}
+            <strong>Respuestas:</strong>
+            ${respuestasHtml}
+          </div>
+        `;
+      })
+    );
+
+    const html = `
+      <html>
+      <head>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            margin: 40px; 
+            color: #000; 
+            background-color: #fff;
+          }
+          h1 { color: #000; }
+          .bloque-pregunta { margin-bottom: 25px; }
+          h3 { margin-bottom: 8px; }
+          ul { margin-top: 4px; margin-bottom: 10px; padding-left: 20px; }
+          li { margin-bottom: 4px; }
+          .respuesta { padding-left: 15px; margin-bottom: 3px; color: #000; }
+          strong { color: #000; }
+          .footer { margin-top: 40px; font-size: 12px; color: #555; }
+          hr { border-color: #000; }
+        </style>
+      </head>
+      <body>
+        <h1>Resultados: ${encuesta.nombre}</h1>
+        <p><strong>Cantidad de encuestados:</strong> ${cantidadEncuestados}</p>
+        <p><strong>Exportado el:</strong> ${new Date().toLocaleString()}</p>
+        <hr />
+        ${bodyHtml.join('')}
+        <div class="footer">Sistema de Encuestas Anónimas - ${new Date().getFullYear()}</div>
+      </body>
+      </html>
+    `;
+
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    const buffer = await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true });
+    await browser.close();
+
+    return Buffer.from(buffer);
+}
+
+
+   
+  /* async generarPDFPorCodigoResultados(codigo: string): Promise<Buffer> {
     const encuesta = await this.encuestaRepo.findOne({
       where: { codigo_resultados: codigo },
       relations: ['preguntas'],
@@ -309,7 +424,7 @@ async remove(id: number): Promise<boolean> {
 
     return Buffer.from(buffer);
   }
-
+ */
   
   //FUNCION ADICIONAL RESUMEN ESTADISTICO
   async generarResumenEstadistico(codigoResultados: string) {

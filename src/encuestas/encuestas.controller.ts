@@ -17,7 +17,7 @@ export class EncuestasController {
 
   @Get()
   startEncuesta(): string {
-    return 'ACA DEBE IRSE ARMANDO LA ENCUESTA, ESTAN LOS CAMPOS PARA COMPLETAR Y CREAR LA ENCUESTA Y EL BOTON PARA HACER';
+    return 'Encuesta';
   }
 
   @Post()
