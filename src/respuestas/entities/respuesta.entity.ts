@@ -1,5 +1,6 @@
 import { Encuesta } from 'src/encuestas/entities/encuesta.entity';
 import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abierta.entity';
+import { RespuestaOpcionMultiple } from 'src/respuestas-opcion-multiple/entities/respuesta-opcion-multiple.entity';
 import { RespuestaOpcionSimple } from 'src/respuestas-opcion-simple/entities/respuesta-opcion-simple.entity';
 import { Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany, Column } from 'typeorm';
 
@@ -16,4 +17,7 @@ export class Respuesta {
 
   @OneToMany(() => RespuestaOpcionSimple, (ro) => ro.respuesta)
   opciones: RespuestaOpcionSimple[];
+
+  @OneToMany(() => RespuestaOpcionMultiple, (ro) => ro.respuestaId)
+  opcionesMultiples: RespuestaOpcionMultiple[];
 }

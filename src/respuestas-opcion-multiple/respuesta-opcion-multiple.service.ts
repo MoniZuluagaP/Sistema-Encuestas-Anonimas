@@ -9,6 +9,7 @@ import { Respuesta } from '../respuestas/entities/respuesta.entity';
 import { Opcion } from '../opciones/entities/opciones.entity';
 import { RespuestaOpcionMultiple } from './entities/respuesta-opcion-multiple.entity';
 import { CreateRespuestaOpcionMultipleDto } from './dto/create-respuestas-opcion-multiple.dto';
+import { RespuestaOpcionMultipleConOpciones } from 'src/interfaces/respuesta-opcion-multiple-con-opciones.interface';
 
 @Injectable()
 export class RespuestasOpcionMultipleService {
@@ -68,10 +69,31 @@ export class RespuestasOpcionMultipleService {
 
   async findRespuestasAbiertasByRespuestaIdYPreguntaId(
     respuestaId: number,
-    preguntaId: number,
+    preguntaId: number
   ) {
     return this.respuestaOpcionRepository.findOne({
       where: { respuestaId, preguntaId },
     });
+  }
+
+  async findByRespuestaIds(
+    respuestaIds: number[],
+  ): Promise<RespuestaOpcionMultipleConOpciones[]> {
+    const respuestas = await this.respuestaOpcionRepository.find({
+      where: { respuestaId: In(respuestaIds) },
+      relations: ['respuesta'],
+    });
+
+    let respuestasConOpciones: RespuestaOpcionMultipleConOpciones[] = [];
+
+    for (const respuesta of respuestas) {
+      const opciones = await this.opcionRepository.findBy({
+        id: In(respuesta.opcionIds),
+      });
+
+      respuestasConOpciones.push({ ...respuesta, opciones });
+    }
+
+    return respuestasConOpciones;
   }
 }

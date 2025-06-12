@@ -68,6 +68,14 @@ export class EncuestasController {
     return this.encuestasService.actualizarFechaVencimiento(codigo, fechaConvertida);
   }
 
+   @Patch(':codigo/actualizar-estado')
+  async actualizarEstado(
+    @Param('codigo') codigo: string,
+    @Body('nuevoEstado') nuevoEstado: boolean
+  ): Promise<Encuesta> {
+    return this.encuestasService.actualizarEstado(codigo, nuevoEstado);
+  }
+
    //Exportar encuesta en PDF
    @Get('exportar/pdf/:codigo')
     async exportarPDF(@Param('codigo') codigo: string, @Res() res: Response) {

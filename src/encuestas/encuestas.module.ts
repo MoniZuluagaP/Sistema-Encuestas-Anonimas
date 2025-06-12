@@ -36,6 +36,8 @@ import { RespuestaOpcionSimple } from 'src/respuestas-opcion-simple/entities/res
 import { RespuestasOpcionSimpleService } from 'src/respuestas-opcion-simple/respuesta-opcion-simple.service';
 
 import { EmailModule } from '../email/email.module'; 
+import { RespuestaOpcionMultiple } from 'src/respuestas-opcion-multiple/entities/respuesta-opcion-multiple.entity';
+import { RespuestasOpcionMultipleService } from 'src/respuestas-opcion-multiple/respuesta-opcion-multiple.service';
 
 @Module({
   imports: [
@@ -46,6 +48,7 @@ import { EmailModule } from '../email/email.module';
       Respuesta,
       RespuestaAbierta,
       RespuestaOpcionSimple,
+      RespuestaOpcionMultiple,
     ]),
       EmailModule,
   ],
@@ -57,6 +60,7 @@ import { EmailModule } from '../email/email.module';
     RespuestasService,
     RespuestasAbiertasService,
     RespuestasOpcionSimpleService,
+    RespuestasOpcionMultipleService,
   ],
 })
 export class EncuestasModule {}

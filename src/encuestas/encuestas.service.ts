@@ -16,6 +16,8 @@ import { RespuestaAbierta } from 'src/respuestas-abiertas/entities/respuesta-abi
 import { RespuestaOpcionSimple } from 'src/respuestas-opcion-simple/entities/respuesta-opcion-simple.entity';
 import { Opcion } from 'src/opciones/entities/opciones.entity';
 import * as puppeteer from 'puppeteer';
+import { RespuestasOpcionMultipleService } from 'src/respuestas-opcion-multiple/respuesta-opcion-multiple.service';
+import { RespuestaOpcionMultipleConOpciones } from 'src/interfaces/respuesta-opcion-multiple-con-opciones.interface';
 export interface ResumenPregunta {
   pregunta: string;
   tipo: any;
@@ -42,6 +44,7 @@ export class EncuestasService {
     private readonly respuestasService: RespuestasService,
     private readonly respuestasAbiertasService: RespuestasAbiertasService,
     private readonly respuestasOpcionesService: RespuestasOpcionSimpleService,
+    private readonly respuestasOpcionMultipleService: RespuestasOpcionMultipleService,
   ) {}
 
   create(createEncuestaDto: CreateEncuestaDto): Promise<Encuesta> {
@@ -88,6 +91,7 @@ async findByCodigo(codigo: string): Promise<Encuesta> {
 
   let respuestasAbiertas: RespuestaAbierta[] = [];
   let respuestasOpciones: RespuestaOpcionSimple[] = [];
+  let respuestasOpcionesMultiples: RespuestaOpcionMultipleConOpciones[] = [];
 
   if (mostrarRespuestas) {
     const respuestas: Respuesta[] = await this.respuestasService.findAllByEncuestaId(encuesta.id);
@@ -95,6 +99,7 @@ async findByCodigo(codigo: string): Promise<Encuesta> {
 
     respuestasAbiertas = await this.respuestasAbiertasService.findRespuestasAbiertasByRespuestaIds(respuestaIds);
     respuestasOpciones = await this.respuestasOpcionesService.findByRespuestaIds(respuestaIds);
+    respuestasOpcionesMultiples = await this.respuestasOpcionMultipleService.findByRespuestaIds(respuestaIds);
   }
 
   const preguntasConOpcionesYRespuestas = await Promise.all(
@@ -105,13 +110,19 @@ async findByCodigo(codigo: string): Promise<Encuesta> {
         opciones = await this.opcionService.findOpcionesByPregunta(pregunta.id);
       }
 
-      const respuestas = mostrarRespuestas
-        ? pregunta.tipo === TipoRespuesta.ABIERTA
-          ? respuestasAbiertas.filter(r => r.pregunta.id === pregunta.id)
-          : respuestasOpciones
-              .filter(ro => ro.opcion.pregunta.id === pregunta.id)
-              .map(ro => ro.opcion)
-        : [];
+      let respuestas: any[] = [];
+
+      if (pregunta.tipo === TipoRespuesta.ABIERTA) {
+        respuestas = respuestasAbiertas.filter(r => r.pregunta.id === pregunta.id);
+      } else if (pregunta.tipo === TipoRespuesta.OPCION_SIMPLE) {
+        respuestas = respuestasOpciones
+          .filter(ro => ro.opcion.pregunta.id === pregunta.id)
+          .map(ro => ro.opcion);
+      } else if (pregunta.tipo === TipoRespuesta.OPCION_MULTIPLE) {
+        respuestas = respuestasOpcionesMultiples
+              .filter(ro => ro.preguntaId === pregunta.id)
+              .map(ro => ro.opciones.map(opcion => opcion.texto).join(' - '))
+      }
 
       return {
         ...pregunta,

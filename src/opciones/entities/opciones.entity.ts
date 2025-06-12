@@ -21,5 +21,4 @@ export class Opcion {
 
   @OneToMany(() => RespuestaOpcionSimple, ro => ro.opcion)
   respuestasOpcion: RespuestaOpcionSimple[];
-
 }
